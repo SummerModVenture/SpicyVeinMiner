@@ -1,3 +1,5 @@
+@file:JvmName("ModInfo")
+
 package net.masterzach32.spicyminer
 
 import org.apache.logging.log4j.Logger

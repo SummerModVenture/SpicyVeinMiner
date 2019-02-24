@@ -1,22 +1,19 @@
 package net.masterzach32.spicyminer
 
 import com.spicymemes.core.util.clientOnly
-import com.spicymemes.core.util.serverOnly
-import javafx.scene.input.KeyCode
 import net.masterzach32.spicyminer.client.ActivateMinerKeybindManager
+import net.masterzach32.spicyminer.client.ChangeModeCommand
+import net.masterzach32.spicyminer.network.ChangeModePacket
 import net.masterzach32.spicyminer.network.ClientPresentPacket
 import net.masterzach32.spicyminer.network.MinerActivatePacket
 import net.masterzach32.spicyminer.network.PingClientPacket
-import net.masterzach32.spicyminer.server.PlayerManager
-import net.minecraft.client.settings.KeyBinding
+import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.*
 import net.minecraftforge.fml.common.network.NetworkRegistry
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper
 import net.minecraftforge.fml.relauncher.Side
-import org.lwjgl.input.Keyboard
-import java.awt.event.KeyEvent
 
 /*
  * SpicyVeinMiner - Created on 5/22/2018
@@ -43,6 +40,8 @@ object SpicyVeinMiner {
         clientOnly {
             MinecraftForge.EVENT_BUS.register(ActivateMinerKeybindManager)
             ActivateMinerKeybindManager.init()
+
+            ClientCommandHandler.instance.registerCommand(ChangeModeCommand())
         }
     }
 
@@ -51,6 +50,7 @@ object SpicyVeinMiner {
         network.registerMessage(PingClientPacket.Handler::class.java, PingClientPacket::class.java, 0, Side.CLIENT)
         network.registerMessage(ClientPresentPacket.Handler::class.java, ClientPresentPacket::class.java, 1, Side.SERVER)
         network.registerMessage(MinerActivatePacket.Handler::class.java, MinerActivatePacket::class.java, 2, Side.SERVER)
+        network.registerMessage(ChangeModePacket.Handler::class.java, ChangeModePacket::class.java, 3, Side.SERVER)
     }
 
     @Mod.EventHandler

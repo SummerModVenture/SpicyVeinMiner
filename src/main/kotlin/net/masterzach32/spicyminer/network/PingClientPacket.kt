@@ -3,6 +3,7 @@ package net.masterzach32.spicyminer.network
 import com.spicymemes.core.network.GenericPacketHandler
 import io.netty.buffer.ByteBuf
 import net.masterzach32.spicyminer.SpicyVeinMiner
+import net.masterzach32.spicyminer.client.preferredMode
 import net.masterzach32.spicyminer.logger
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
@@ -20,7 +21,7 @@ class PingClientPacket : IMessage {
 
         override fun processMessage(message: PingClientPacket, ctx: MessageContext) {
             logger.info("Recieved Spicy VeinMiner server ping packet.")
-            SpicyVeinMiner.network.sendToServer(ClientPresentPacket())
+            SpicyVeinMiner.network.sendToServer(ClientPresentPacket(preferredMode))
         }
     }
 }

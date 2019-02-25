@@ -7,10 +7,13 @@ import net.masterzach32.spicyminer.network.ChangeModePacket
 import net.masterzach32.spicyminer.network.ClientPresentPacket
 import net.masterzach32.spicyminer.network.MinerActivatePacket
 import net.masterzach32.spicyminer.network.PingClientPacket
+import net.masterzach32.spicyminer.server.VeinMinerHelper
+import net.minecraft.init.Items
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.*
+import net.minecraftforge.fml.common.network.NetworkCheckHandler
 import net.minecraftforge.fml.common.network.NetworkRegistry
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper
 import net.minecraftforge.fml.relauncher.Side
@@ -33,6 +36,9 @@ object SpicyVeinMiner {
 
     val network: SimpleNetworkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(MOD_ID)
 
+    @NetworkCheckHandler
+    fun checkClientModVersion(mods: Map<String, String>, side: Side) = true
+
     @Mod.EventHandler
     fun preInit(event: FMLPreInitializationEvent) {
         logger = event.modLog
@@ -54,5 +60,7 @@ object SpicyVeinMiner {
     }
 
     @Mod.EventHandler
-    fun postInit(event: FMLPostInitializationEvent) {}
+    fun postInit(event: FMLPostInitializationEvent) {
+        println(VeinMinerHelper.isValidTool(Items.DIAMOND_PICKAXE))
+    }
 }

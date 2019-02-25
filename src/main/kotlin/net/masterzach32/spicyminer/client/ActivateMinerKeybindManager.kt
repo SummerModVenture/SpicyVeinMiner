@@ -2,6 +2,7 @@ package net.masterzach32.spicyminer.client
 
 import net.masterzach32.spicyminer.SpicyVeinMiner
 import net.masterzach32.spicyminer.network.MinerActivatePacket
+import net.masterzach32.spicyminer.config.preferredMode
 import net.masterzach32.spicyminer.util.PreferredMode
 import net.minecraft.client.settings.KeyBinding
 import net.minecraftforge.fml.client.registry.ClientRegistry

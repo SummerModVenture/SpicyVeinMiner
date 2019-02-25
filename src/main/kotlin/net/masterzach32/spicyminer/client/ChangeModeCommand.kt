@@ -2,6 +2,7 @@ package net.masterzach32.spicyminer.client
 
 import net.masterzach32.spicyminer.SpicyVeinMiner
 import net.masterzach32.spicyminer.network.ChangeModePacket
+import net.masterzach32.spicyminer.config.preferredMode
 import net.masterzach32.spicyminer.util.PreferredMode
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.command.CommandBase

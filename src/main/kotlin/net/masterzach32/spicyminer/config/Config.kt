@@ -5,6 +5,7 @@ package net.masterzach32.spicyminer.config
 
 import net.masterzach32.spicyminer.MOD_ID
 import net.masterzach32.spicyminer.util.PreferredMode
+import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraftforge.common.config.Config
 
@@ -17,12 +18,14 @@ var preferredMode: PreferredMode = PreferredMode.PRESSED
 @Config.Comment(
         "How many blocks can be excavated at once."
 )
+@Config.RangeInt(min = 2, max = 200)
 @JvmField
 var limit: Int = 100
 
 @Config.Comment(
         "How far from the initial block can blocks be excavated."
 )
+@Config.RangeInt(min = 2, max = 50)
 @JvmField
 var range: Int = 20
 
@@ -54,4 +57,15 @@ var tools: Array<String> = listOf(
         Items.IRON_PICKAXE,
         Items.STONE_PICKAXE,
         Items.WOODEN_PICKAXE
+).map { it.registryName.toString() }.toTypedArray()
+
+@Config.Comment(
+        "List of blocks that cannot be veinmined."
+)
+@JvmField
+var blockBlacklist: Array<String> = listOf(
+        Blocks.STONE,
+        Blocks.DIRT,
+        Blocks.SAND,
+        Blocks.GRAVEL
 ).map { it.registryName.toString() }.toTypedArray()

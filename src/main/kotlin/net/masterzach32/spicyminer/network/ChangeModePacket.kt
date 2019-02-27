@@ -7,6 +7,7 @@ import net.masterzach32.spicyminer.server.PlayerManager
 import net.masterzach32.spicyminer.util.PlayerStatus
 import net.masterzach32.spicyminer.util.PreferredMode
 import net.minecraft.util.text.TextComponentTranslation
+import net.minecraft.util.text.translation.I18n
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
 
@@ -27,6 +28,7 @@ open class ChangeModePacket(var mode: PreferredMode) : IMessage {
 
     class Handler : GenericPacketHandler<ChangeModePacket>() {
 
+        @Suppress("DEPRECATION")
         override fun processMessage(message: ChangeModePacket, ctx: MessageContext) {
             val player = ctx.serverHandler.player
             val playerName = player.uniqueID

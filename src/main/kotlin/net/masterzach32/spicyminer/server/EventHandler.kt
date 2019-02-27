@@ -4,12 +4,14 @@ import com.spicymemes.core.util.getBlock
 import com.spicymemes.core.util.serverOnly
 import net.masterzach32.spicyminer.MOD_ID
 import net.masterzach32.spicyminer.SpicyVeinMiner
+import net.masterzach32.spicyminer.logger
 import net.masterzach32.spicyminer.network.PingClientPacket
 import net.masterzach32.spicyminer.util.PlayerStatus
 import net.minecraft.entity.player.EntityPlayerMP
 import net.minecraft.item.ItemPickaxe
 import net.minecraftforge.event.world.BlockEvent
 import net.minecraftforge.fml.common.Mod
+import net.minecraftforge.fml.common.event.FMLInterModComms
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.PlayerEvent
 
@@ -22,21 +24,19 @@ object EventHandler {
     fun onBlockBreak(event: BlockEvent.BreakEvent) {
         serverOnly(event.world) {
             val tool = event.player.getHeldItem(event.player.activeHand)
-            if (VeinMinerHelper.isValidTool(tool)) {
-                var activate = false
+            var activate = false
 
-                val status = PlayerManager.getPlayerStatus(event.player.uniqueID)
-                if (status == PlayerStatus.ACTIVE)
-                    activate = true
-                else if (status == PlayerStatus.SNEAK_ACTIVE && event.player.isSneaking)
-                    activate = true
-                else if (status == PlayerStatus.SNEAK_INACTIVE && !event.player.isSneaking)
-                    activate = true
+            val status = PlayerManager.getPlayerStatus(event.player.uniqueID)
+            if (status == PlayerStatus.ACTIVE)
+                activate = true
+            else if (status == PlayerStatus.SNEAK_ACTIVE && event.player.isSneaking)
+                activate = true
+            else if (status == PlayerStatus.SNEAK_INACTIVE && !event.player.isSneaking)
+                activate = true
 
-                if (activate) {
-                    val biw = event.world.getBlock(event.pos)
-                    VeinMinerHelper.harvestBlocks(biw, event.player, tool, VeinMinerHelper.getAlikeBlocks(biw))
-                }
+            if (activate) {
+                val biw = event.world.getBlock(event.pos)
+                VeinMinerHelper.attemptExcavate(biw, tool, event.player)
             }
         }
     }

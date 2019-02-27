@@ -18,8 +18,12 @@ object ActivateMinerKeybindManager {
     private var statusEnabled = false
     private val activateKey = KeyBinding("spicyveinminer.key.enable", Keyboard.KEY_GRAVE, "spicyveinminer.key.category")
 
+    init {
+        ClientRegistry.registerKeyBinding(activateKey)
+    }
+
     @SubscribeEvent
-    fun onKeyPressed(event: InputEvent.KeyInputEvent) {
+    fun onKeyPressed(event: InputEvent) {
         if (preferredMode != PreferredMode.PRESSED)
             return
 
@@ -36,9 +40,5 @@ object ActivateMinerKeybindManager {
 
         if (sendPacket)
             SpicyVeinMiner.network.sendToServer(MinerActivatePacket(statusEnabled))
-    }
-
-    fun init() {
-        ClientRegistry.registerKeyBinding(activateKey)
     }
 }

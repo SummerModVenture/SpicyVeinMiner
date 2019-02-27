@@ -1,13 +1,15 @@
 package net.masterzach32.spicyminer
 
 import com.spicymemes.core.util.clientOnly
+import net.masterzach32.spicyminer.api.addTool
 import net.masterzach32.spicyminer.client.ActivateMinerKeybindManager
 import net.masterzach32.spicyminer.client.ChangeModeCommand
+import net.masterzach32.spicyminer.config.Tools
+import net.masterzach32.spicyminer.config.tools
 import net.masterzach32.spicyminer.network.ChangeModePacket
 import net.masterzach32.spicyminer.network.ClientPresentPacket
 import net.masterzach32.spicyminer.network.MinerActivatePacket
 import net.masterzach32.spicyminer.network.PingClientPacket
-import net.masterzach32.spicyminer.server.VeinMinerHelper
 import net.minecraft.init.Items
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.common.MinecraftForge
@@ -30,8 +32,7 @@ import net.minecraftforge.fml.relauncher.Side
  * @author Zach Kozar
  * @version 5/22/2018
  */
-@Mod(modid = MOD_ID, name = MOD_NAME, version = MOD_VERSION, modLanguage = "kotlin",
-        modLanguageAdapter = "com.spicymemes.core.KotlinAdapter")
+@Mod(modid = MOD_ID, name = MOD_NAME, version = MOD_VERSION, modLanguageAdapter = "com.spicymemes.core.KotlinAdapter")
 object SpicyVeinMiner {
 
     val network: SimpleNetworkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(MOD_ID)
@@ -45,8 +46,6 @@ object SpicyVeinMiner {
 
         clientOnly {
             MinecraftForge.EVENT_BUS.register(ActivateMinerKeybindManager)
-            ActivateMinerKeybindManager.init()
-
             ClientCommandHandler.instance.registerCommand(ChangeModeCommand())
         }
     }
@@ -57,10 +56,17 @@ object SpicyVeinMiner {
         network.registerMessage(ClientPresentPacket.Handler::class.java, ClientPresentPacket::class.java, 1, Side.SERVER)
         network.registerMessage(MinerActivatePacket.Handler::class.java, MinerActivatePacket::class.java, 2, Side.SERVER)
         network.registerMessage(ChangeModePacket.Handler::class.java, ChangeModePacket::class.java, 3, Side.SERVER)
+
+        Tools.addAllTools()
     }
 
     @Mod.EventHandler
     fun postInit(event: FMLPostInitializationEvent) {
-        println(VeinMinerHelper.isValidTool(Items.DIAMOND_PICKAXE))
+
+    }
+
+    @Mod.EventHandler
+    fun imcCallback(event: FMLInterModComms.IMCEvent) {
+        tools = tools.toMutableSet().apply { addAll(event.messages.map { it.nbtValue.getString("name") }) }.toTypedArray()
     }
 }

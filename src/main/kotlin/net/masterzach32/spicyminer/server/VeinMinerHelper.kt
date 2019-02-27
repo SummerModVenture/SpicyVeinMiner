@@ -4,20 +4,16 @@ import com.spicymemes.core.util.BlockInWorld
 import com.spicymemes.core.util.distance
 import com.spicymemes.core.util.getBlock
 import com.spicymemes.core.util.getBlocksWithin
-import net.masterzach32.spicyminer.config.exhaustion
-import net.masterzach32.spicyminer.config.limit
-import net.masterzach32.spicyminer.config.range
-import net.masterzach32.spicyminer.config.tools
+import net.masterzach32.spicyminer.config.*
+import net.masterzach32.spicyminer.logger
 import net.masterzach32.spicyminer.util.DropSet
 import net.minecraft.block.Block
+import net.minecraft.block.state.IBlockState
 import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.init.Enchantments
-import net.minecraft.init.Items
-import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.util.NonNullList
-import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 
@@ -26,49 +22,59 @@ import net.minecraft.world.World
  */
 object VeinMinerHelper {
 
-    private val validTools = mutableListOf<Item>()
-
-    init {
-        println(tools)
-        tools.map { Item.REGISTRY.getObject(ResourceLocation(it)) }
-        println(validTools)
+    fun attemptExcavate(biw: BlockInWorld, tool: ItemStack, player: EntityPlayer) {
+        if (isValidTool(tool))
+            if (isValidBlock(biw.block))
+                harvestBlocks(biw.pos, biw.world, biw.block, biw.state, tool, player, getAlikeBlocks(biw))
     }
 
-    // TODO: add other mods' tools
-    fun isValidTool(item: Item) = validTools.contains(item)
+    fun isValidTool(stack: ItemStack) = tools.contains(stack.item.registryName.toString())
 
-    fun isValidTool(stack: ItemStack) = isValidTool(stack.item)
+    fun isValidBlock(block: Block) = !blockBlacklist.contains(block.registryName.toString())
 
-    fun getAlikeBlocks(biw: BlockInWorld) = getAlikeBlocks(biw.pos, biw.world, biw.block, mutableSetOf()).toList()
+    fun getAlikeBlocks(biw: BlockInWorld) = getAlikeBlocks(biw.pos, biw.pos, biw.world, biw.block, mutableSetOf()).toList()
 
-    private fun getAlikeBlocks(pos: BlockPos, world: World, block: Block, blocks: MutableSet<BlockPos>): Set<BlockPos> {
-        if (blocks.size < limit)
-            pos.getBlocksWithin(1).asSequence()
-                    .filter { world.getBlock(it).block.unlocalizedName == block.unlocalizedName }
-                    .filter { pos.distance(it) < range }
-                    .filter { blocks.add(it) }
-                    .forEach { getAlikeBlocks(it, world, block, blocks) }
+    private fun getAlikeBlocks(
+            origin: BlockPos,
+            pos: BlockPos,
+            world: World,
+            block: Block,
+            blocks: MutableSet<BlockPos>
+    ): Set<BlockPos> {
+        pos.getBlocksWithin(1).asSequence()
+                .filter { world.getBlock(it).block.unlocalizedName == block.unlocalizedName }
+                .filter { origin.distance(it) < range }
+                .filter { blocks.size <= limit && blocks.add(it) }
+                .forEach { getAlikeBlocks(origin, it, world, block, blocks) }
 
         return blocks
     }
 
-    fun harvestBlocks(biw: BlockInWorld, player: EntityPlayer, tool: ItemStack, blocks: List<BlockPos>) {
+    fun harvestBlocks(
+            origin: BlockPos,
+            world: World,
+            block: Block,
+            state: IBlockState,
+            tool: ItemStack,
+            player: EntityPlayer,
+            blocks: List<BlockPos>
+    ) {
         if (blocks.isEmpty())
             return
 
         val drops = DropSet()
         blocks.forEach {
-            biw.world.setBlockToAir(it)
+            world.setBlockToAir(it)
 
             val list = NonNullList.create<ItemStack>()
             val fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, tool)
-            biw.block.getDrops(list, biw.world, biw.pos, biw.state, fortune)
+            block.getDrops(list, world, it, state, fortune)
             list.forEach { stack -> drops.addDrop(stack) }
 
             tool.damageItem(1, player)
             player.addExhaustion(exhaustion.toFloat())
-            biw.block.dropXpOnBlockBreak(biw.world, biw.pos, biw.block.getExpDrop(biw.state, biw.world, biw.pos, fortune))
+            block.dropXpOnBlockBreak(world, origin, block.getExpDrop(state, world, it, fortune))
         }
-        drops.getDrops().forEach { Block.spawnAsEntity(biw.world, biw.pos, it) }
+        drops.getDrops().forEach { Block.spawnAsEntity(world, origin, it) }
     }
 }

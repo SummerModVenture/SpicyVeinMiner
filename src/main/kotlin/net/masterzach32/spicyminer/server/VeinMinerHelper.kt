@@ -23,9 +23,11 @@ import net.minecraft.world.World
 object VeinMinerHelper {
 
     fun attemptExcavate(biw: BlockInWorld, tool: ItemStack, player: EntityPlayer) {
-        if (isValidTool(tool))
-            if (isValidBlock(biw.block))
-                harvestBlocks(biw.pos, biw.world, biw.block, biw.state, tool, player, getAlikeBlocks(biw))
+        if (
+                isValidTool(tool) &&
+                isValidBlock(biw.block)
+        )
+            harvestBlocks(biw.pos, biw.world, biw.block, biw.state, tool, player, getAlikeBlocks(biw))
     }
 
     fun isValidTool(stack: ItemStack) = tools.contains(stack.item.registryName.toString())

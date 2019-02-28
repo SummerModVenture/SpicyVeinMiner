@@ -65,6 +65,7 @@ var tools: Array<String> = listOf(
 @JvmField
 var blockBlacklist: Array<String> = listOf(
         Blocks.STONE,
+        Blocks.COBBLESTONE,
         Blocks.DIRT,
         Blocks.SAND,
         Blocks.GRAVEL

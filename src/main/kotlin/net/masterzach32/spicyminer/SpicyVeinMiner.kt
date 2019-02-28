@@ -1,7 +1,6 @@
 package net.masterzach32.spicyminer
 
 import com.spicymemes.core.util.clientOnly
-import net.masterzach32.spicyminer.api.addTool
 import net.masterzach32.spicyminer.client.ActivateMinerKeybindManager
 import net.masterzach32.spicyminer.client.ChangeModeCommand
 import net.masterzach32.spicyminer.config.Tools
@@ -10,7 +9,6 @@ import net.masterzach32.spicyminer.network.ChangeModePacket
 import net.masterzach32.spicyminer.network.ClientPresentPacket
 import net.masterzach32.spicyminer.network.MinerActivatePacket
 import net.masterzach32.spicyminer.network.PingClientPacket
-import net.minecraft.init.Items
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Mod

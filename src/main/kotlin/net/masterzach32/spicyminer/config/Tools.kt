@@ -1,7 +1,7 @@
 package net.masterzach32.spicyminer.config
 
 import com.spicymemes.core.util.ifModLoaded
-import net.masterzach32.spicyminer.api.addTool
+import net.masterzach32.spicyminer.api.IMCHelper
 import net.minecraft.util.ResourceLocation
 
 object Tools {
@@ -18,10 +18,12 @@ object Tools {
     private fun addToolSet(toolType: String, tools: List<ResourceLocation>) {
         tools.forEach { tool ->
             ifModLoaded(tool.resourceDomain) {
-                addTool(toolType, tool)
+                IMCHelper.addTool(toolType, tool)
             }
         }
     }
+
+    // list of non-vanilla tools. Any tools here will be automatically added if their mod is loaded.
 
     val HAMMER_ARRAY = listOf(
             "redstonearsenal:tool.hammer_flux",

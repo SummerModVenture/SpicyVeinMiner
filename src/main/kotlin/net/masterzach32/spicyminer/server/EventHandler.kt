@@ -4,6 +4,7 @@ import com.spicymemes.core.util.getBlock
 import com.spicymemes.core.util.serverOnly
 import net.masterzach32.spicyminer.MOD_ID
 import net.masterzach32.spicyminer.SpicyVeinMiner
+import net.masterzach32.spicyminer.api.VeinMinerEvent
 import net.masterzach32.spicyminer.logger
 import net.masterzach32.spicyminer.network.PingClientPacket
 import net.masterzach32.spicyminer.util.PlayerStatus
@@ -24,7 +25,7 @@ object EventHandler {
     @SubscribeEvent
     fun onBlockBreak(event: BlockEvent.BreakEvent) {
         serverOnly(event.world) {
-            val tool = event.player.getHeldItem(event.player.activeHand)
+            val tool = event.player.heldItemMainhand
             var activate = false
 
             val status = PlayerManager.getPlayerStatus(event.player.uniqueID)

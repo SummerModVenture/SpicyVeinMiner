@@ -3,13 +3,13 @@ package net.masterzach32.spicyminer
 import com.spicymemes.core.util.clientOnly
 import net.masterzach32.spicyminer.client.ActivateMinerKeybindManager
 import net.masterzach32.spicyminer.client.ChangeModeCommand
+import net.masterzach32.spicyminer.config.Config
+import net.masterzach32.spicyminer.config.ToolType
 import net.masterzach32.spicyminer.config.Tools
-import net.masterzach32.spicyminer.config.tools
 import net.masterzach32.spicyminer.network.ChangeModePacket
 import net.masterzach32.spicyminer.network.ClientPresentPacket
 import net.masterzach32.spicyminer.network.MinerActivatePacket
 import net.masterzach32.spicyminer.network.PingClientPacket
-import net.minecraft.client.Minecraft
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.common.MinecraftForge
@@ -67,6 +67,17 @@ object SpicyVeinMiner {
 
     @Mod.EventHandler
     fun imcCallback(event: FMLInterModComms.IMCEvent) {
-        tools = tools.toMutableSet().apply { addAll(event.messages.map { ResourceLocation(it.nbtValue.getString("name")) }) }.toTypedArray()
+        event.messages
+                .filter { it.key == "addTool" }
+                .distinctBy { it.nbtValue.getString("type") }
+                .map { ToolType(it.nbtValue.getString("type")) }
+                .forEach { toolType ->
+                    val toolsToAdd = event.messages
+                            .map { it.nbtValue }
+                            .filter { it.getString("type") == toolType.name }
+                            .map { ResourceLocation(it.getString("name")) }
+                    Config.addTools(toolType, toolsToAdd)
+                    logger.info("Received IMC message to add tools: toolType=${toolType.name}, tools=$toolsToAdd")
+                }
     }
 }

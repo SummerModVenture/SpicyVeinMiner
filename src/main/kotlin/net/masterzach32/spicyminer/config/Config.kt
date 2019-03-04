@@ -1,4 +1,4 @@
-@file:JvmName("Config")
+@file:JvmName("ConfigOptions")
 @file:Config(modid = MOD_ID, name = "SpicyVeinMiner", category = "general")
 
 package net.masterzach32.spicyminer.config
@@ -48,22 +48,43 @@ var ignoreTools: Boolean = false
 @JvmField
 var vanillaOnly: Boolean = false
 
+object Config {
 
-var tools: Array<ResourceLocation> = listOf(
-        Items.DIAMOND_PICKAXE,
-        Items.GOLDEN_PICKAXE,
-        Items.IRON_PICKAXE,
-        Items.STONE_PICKAXE,
-        Items.WOODEN_PICKAXE
-).mapNotNull { it.registryName }.toTypedArray()
+    private val tools = mutableMapOf<ToolType, List<ResourceLocation>>()
+    val registeredTools: Map<ToolType, List<ResourceLocation>>
+        get() = tools.toMap()
 
+    var blockBlacklist: Array<ResourceLocation> = listOf(
+            Blocks.STONE,
+            Blocks.COBBLESTONE,
+            Blocks.DIRT,
+            Blocks.GRASS,
+            Blocks.SAND,
+            Blocks.GRAVEL,
+            Blocks.NETHERRACK
+    ).mapNotNull { it.registryName }.toTypedArray()
 
-var blockBlacklist: Array<ResourceLocation> = listOf(
-        Blocks.STONE,
-        Blocks.COBBLESTONE,
-        Blocks.DIRT,
-        Blocks.GRASS,
-        Blocks.SAND,
-        Blocks.GRAVEL,
-        Blocks.NETHERRACK
-).mapNotNull { it.registryName }.toTypedArray()
+    fun hasToolType(toolType: ToolType) = tools.containsKey(toolType)
+
+    fun addToolType(toolType: ToolType) {
+        tools[toolType] = emptyList()
+    }
+
+    fun addTool(toolType: ToolType, tool: ResourceLocation) {
+        if (hasToolType(toolType))
+            tools[toolType] = tools[toolType]!!.toMutableList().apply { add(tool) }
+        else {
+            addToolType(toolType)
+            tools[toolType] = tools[toolType]!!.toMutableList().apply { add(tool) }
+        }
+    }
+
+    fun addTools(toolType: ToolType, list: List<ResourceLocation>) {
+        if (hasToolType(toolType))
+            tools[toolType] = tools[toolType]!!.toMutableList().apply { addAll(list) }
+        else {
+            addToolType(toolType)
+            tools[toolType] = tools[toolType]!!.toMutableList().apply { addAll(list) }
+        }
+    }
+}

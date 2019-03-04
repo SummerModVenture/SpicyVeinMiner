@@ -24,7 +24,12 @@ import net.minecraftforge.common.MinecraftForge
  */
 object VeinMinerHelper {
 
-    fun attemptExcavate(biw: BlockInWorld, tool: ItemStack, player: EntityPlayerMP) {
+    fun attemptExcavate(biw: BlockInWorld, tool: ItemStack?, player: EntityPlayerMP) {
+        if (biw.world.isRemote)
+            throw Exception("VeinMinerHelper#attemptExcavate() must be run on the server!")
+        if (tool == null)
+            return
+
         val preCheckEvent = VeinMinerEvent.PreToolUseCheck(biw.pos, biw.state, player, tool)
         MinecraftForge.EVENT_BUS.post(preCheckEvent)
         if (
@@ -37,11 +42,11 @@ object VeinMinerHelper {
         }
     }
 
-    fun isValidTool(stack: ItemStack) = tools.contains(stack.item.registryName)
+    fun isValidTool(stack: ItemStack) = Config.registeredTools.any { it.value.contains(stack.item.registryName) }
 
-    fun isValidBlock(block: Block) = !blockBlacklist.contains(block.registryName)
+    fun isValidBlock(block: Block) = !Config.blockBlacklist.contains(block.registryName)
 
-    fun getAlikeBlocks(biw: BlockInWorld) = getAlikeBlocks(biw.pos, biw.pos, biw.world, biw.block, mutableSetOf()).toList()
+    private fun getAlikeBlocks(biw: BlockInWorld) = getAlikeBlocks(biw.pos, biw.pos, biw.world, biw.block, mutableSetOf()).toList()
 
     private fun getAlikeBlocks(
             origin: BlockPos,
@@ -59,7 +64,7 @@ object VeinMinerHelper {
         return blocks
     }
 
-    fun harvestBlocks(
+    private fun harvestBlocks(
             origin: BlockPos,
             world: World,
             block: Block,

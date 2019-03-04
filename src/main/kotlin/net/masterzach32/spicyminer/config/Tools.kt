@@ -6,21 +6,19 @@ import net.minecraft.util.ResourceLocation
 
 object Tools {
 
-    // TODO: Type alias tool names
-
     fun addAllTools() {
-        addToolSet("hammer", HAMMER_ARRAY)
-        addToolSet("drill", DRILL_ARRAY)
-        addToolSet("pickaxe", PICKAXE_ARRAY)
-        addToolSet("shovel", SHOVEL_ARRAY)
-        addToolSet("axe", AXE_ARRAY)
-        addToolSet("multitool", MULTITOOL_ARRAY)
+        addToolSet(ToolType("hammer"), HAMMER_ARRAY)
+        addToolSet(ToolType("drill"), DRILL_ARRAY)
+        addToolSet(ToolType("pickaxe"), PICKAXE_ARRAY)
+        addToolSet(ToolType("shovel"), SHOVEL_ARRAY)
+        addToolSet(ToolType("axe"), AXE_ARRAY)
+        addToolSet(ToolType("multitool"), MULTITOOL_ARRAY)
     }
 
-    private fun addToolSet(toolType: String, tools: List<ResourceLocation>) {
+    private fun addToolSet(toolType: ToolType, tools: List<ResourceLocation>) {
         tools.forEach { tool ->
             ifModLoaded(tool.resourceDomain) {
-                IMCHelper.addTool(toolType, tool)
+                IMCHelper.addTool(toolType.name, tool)
             }
         }
     }

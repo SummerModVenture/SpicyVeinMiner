@@ -9,6 +9,7 @@ import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import net.minecraft.command.WrongUsageException
 import net.minecraft.server.MinecraftServer
+import net.minecraft.util.text.translation.I18n
 
 class ChangeModeCommand : CommandBase() {
 
@@ -26,10 +27,21 @@ class ChangeModeCommand : CommandBase() {
             throw WrongUsageException(getUsage(sender))
 
         val newMode: PreferredMode = when {
-            args[0] == modes[0] && preferredMode != PreferredMode.DISABLED -> PreferredMode.DISABLED
-            args[0] == modes[1] && preferredMode != PreferredMode.PRESSED -> PreferredMode.PRESSED
-            args[0] == modes[2] && preferredMode != PreferredMode.SNEAK_ACTIVE ->  PreferredMode.SNEAK_ACTIVE
-            args[0] == modes[3] && preferredMode != PreferredMode.SNEAK_INACTIVE -> PreferredMode.SNEAK_INACTIVE
+            args[0] == modes[0] && preferredMode != PreferredMode.DISABLED -> {
+                PreferredMode.DISABLED
+            }
+            args[0] == modes[1] && preferredMode != PreferredMode.PRESSED -> {
+                PreferredMode.PRESSED
+            }
+            args[0] == modes[2] && preferredMode != PreferredMode.RELEASED -> {
+                PreferredMode.RELEASED
+            }
+            args[0] == modes[3] && preferredMode != PreferredMode.SNEAK_ACTIVE -> {
+                PreferredMode.SNEAK_ACTIVE
+            }
+            args[0] == modes[4] && preferredMode != PreferredMode.SNEAK_INACTIVE -> {
+                PreferredMode.SNEAK_INACTIVE
+            }
             else -> throw WrongUsageException(getUsage(sender))
         }
 
@@ -37,10 +49,10 @@ class ChangeModeCommand : CommandBase() {
         SpicyVeinMiner.network.sendToServer(ChangeModePacket(newMode))
     }
 
-    override fun getUsage(sender: ICommandSender) = "/sveinminerc disabled/pressed/sneak/no_sneak"
-
+    @Suppress("DEPRECATION")
+    override fun getUsage(sender: ICommandSender): String = I18n.translateToLocal("text.spicyveinminer.command.sveinminerc.usage")
 
     companion object {
-        private val modes = arrayOf("disabled", "pressed", "sneak", "no_sneak")
+        private val modes = arrayOf("disabled", "pressed", "released", "sneak", "no_sneak")
     }
 }

@@ -11,17 +11,23 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
 /**
  * Packet to ping the client to see if this mod is installed.
  */
-class PingClientPacket : IMessage {
+class PingClientPacket(var timestamp: Long) : IMessage {
 
-    override fun fromBytes(buf: ByteBuf) {}
+    constructor() : this(0L)
 
-    override fun toBytes(buf: ByteBuf) {}
+    override fun fromBytes(buf: ByteBuf) {
+        timestamp = buf.readLong()
+    }
+
+    override fun toBytes(buf: ByteBuf) {
+        buf.writeLong(timestamp)
+    }
 
     class Handler : GenericPacketHandler<PingClientPacket>() {
 
         override fun processMessage(message: PingClientPacket, ctx: MessageContext) {
             logger.info("Recieved Spicy VeinMiner server ping packet.")
-            SpicyVeinMiner.network.sendToServer(ClientPresentPacket(preferredMode))
+            SpicyVeinMiner.network.sendToServer(ClientPresentPacket(message.timestamp, preferredMode))
         }
     }
 }

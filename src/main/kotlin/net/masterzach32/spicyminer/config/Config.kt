@@ -7,6 +7,7 @@ import net.masterzach32.spicyminer.MOD_ID
 import net.masterzach32.spicyminer.util.PreferredMode
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
+import net.minecraft.util.ResourceLocation
 import net.minecraftforge.common.config.Config
 
 @Config.Comment(
@@ -47,26 +48,22 @@ var ignoreTools: Boolean = false
 @JvmField
 var vanillaOnly: Boolean = false
 
-@Config.Comment(
-        "All tools that can be used to veinmine. Most tools should be auto-populated here."
-)
-@JvmField
-var tools: Array<String> = listOf(
+
+var tools: Array<ResourceLocation> = listOf(
         Items.DIAMOND_PICKAXE,
         Items.GOLDEN_PICKAXE,
         Items.IRON_PICKAXE,
         Items.STONE_PICKAXE,
         Items.WOODEN_PICKAXE
-).map { it.registryName.toString() }.toTypedArray()
+).mapNotNull { it.registryName }.toTypedArray()
 
-@Config.Comment(
-        "List of blocks that cannot be veinmined."
-)
-@JvmField
-var blockBlacklist: Array<String> = listOf(
+
+var blockBlacklist: Array<ResourceLocation> = listOf(
         Blocks.STONE,
         Blocks.COBBLESTONE,
         Blocks.DIRT,
+        Blocks.GRASS,
         Blocks.SAND,
-        Blocks.GRAVEL
-).map { it.registryName.toString() }.toTypedArray()
+        Blocks.GRAVEL,
+        Blocks.NETHERRACK
+).mapNotNull { it.registryName }.toTypedArray()

@@ -14,6 +14,7 @@ import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInterModComms
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.PlayerEvent
+import java.time.Instant
 
 @Suppress("unused")
 @Mod.EventBusSubscriber(modid = MOD_ID)
@@ -36,7 +37,7 @@ object EventHandler {
 
             if (activate) {
                 val biw = event.world.getBlock(event.pos)
-                VeinMinerHelper.attemptExcavate(biw, tool, event.player)
+                VeinMinerHelper.attemptExcavate(biw, tool, event.player as EntityPlayerMP)
             }
         }
     }
@@ -44,7 +45,7 @@ object EventHandler {
     @JvmStatic
     @SubscribeEvent
     fun onPlayerConnected(event: PlayerEvent.PlayerLoggedInEvent) {
-        SpicyVeinMiner.network.sendTo(PingClientPacket(), event.player as EntityPlayerMP)
+        SpicyVeinMiner.network.sendTo(PingClientPacket(Instant.now().toEpochMilli()), event.player as EntityPlayerMP)
     }
 
     @JvmStatic

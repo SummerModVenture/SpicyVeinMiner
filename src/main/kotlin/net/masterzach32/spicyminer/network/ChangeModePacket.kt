@@ -36,17 +36,18 @@ open class ChangeModePacket(var mode: PreferredMode) : IMessage {
 
             when(message.mode) {
                 PreferredMode.DISABLED,
-                PreferredMode.PRESSED -> {
+                PreferredMode.PRESSED,
+                PreferredMode.RELEASED -> {
                     PlayerManager.setPlayerStatus(playerName, PlayerStatus.INACTIVE)
-                    player.sendMessage(TextComponentTranslation("mod.spicyveinminer.preferredmode.auto"))
+                    player.sendMessage(TextComponentTranslation("text.spicyveinminer.preferredmode.auto"))
                 }
                 PreferredMode.SNEAK_ACTIVE -> {
                     PlayerManager.setPlayerStatus(playerName, PlayerStatus.SNEAK_ACTIVE)
-                    player.sendMessage(TextComponentTranslation("mod.spicyveinminer.preferredmode.sneak"))
+                    player.sendMessage(TextComponentTranslation("text.spicyveinminer.preferredmode.sneak"))
                 }
                 PreferredMode.SNEAK_INACTIVE -> {
                     PlayerManager.setPlayerStatus(playerName, PlayerStatus.SNEAK_INACTIVE)
-                    player.sendMessage(TextComponentTranslation("mod.spicyveinminer.preferredmode.nosneak"))
+                    player.sendMessage(TextComponentTranslation("text.spicyveinminer.preferredmode.nosneak"))
                 }
             }
         }

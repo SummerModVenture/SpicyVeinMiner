@@ -24,18 +24,28 @@ object ActivateMinerKeybindManager {
 
     @SubscribeEvent
     fun onKeyPressed(event: InputEvent) {
-        if (preferredMode != PreferredMode.PRESSED)
+        if (preferredMode != PreferredMode.PRESSED && preferredMode != PreferredMode.RELEASED)
             return
 
         var sendPacket = false
         val pressed = activateKey.isKeyDown
 
-        if (pressed && !statusEnabled) {
-            sendPacket = true
-            statusEnabled = true
-        } else if (!pressed && statusEnabled) {
-            sendPacket = true
-            statusEnabled = false
+        if (preferredMode == PreferredMode.PRESSED) {
+            if (pressed && !statusEnabled) {
+                sendPacket = true
+                statusEnabled = true
+            } else if (!pressed && statusEnabled) {
+                sendPacket = true
+                statusEnabled = false
+            }
+        } else {
+            if (!pressed && !statusEnabled) {
+                sendPacket = true
+                statusEnabled = true
+            } else if (pressed && statusEnabled) {
+                sendPacket = true
+                statusEnabled = false
+            }
         }
 
         if (sendPacket)

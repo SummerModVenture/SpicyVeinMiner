@@ -4,35 +4,42 @@ import com.spicymemes.core.util.BlockInWorld
 import com.spicymemes.core.util.distance
 import com.spicymemes.core.util.getBlock
 import com.spicymemes.core.util.getBlocksWithin
+import net.masterzach32.spicyminer.api.VeinMinerEvent
 import net.masterzach32.spicyminer.config.*
-import net.masterzach32.spicyminer.logger
 import net.masterzach32.spicyminer.util.DropSet
 import net.minecraft.block.Block
 import net.minecraft.block.state.IBlockState
 import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.entity.player.EntityPlayerMP
 import net.minecraft.init.Enchantments
 import net.minecraft.item.ItemStack
 import net.minecraft.util.NonNullList
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
+import net.minecraftforge.common.MinecraftForge
 
 /**
  * Main logic
  */
 object VeinMinerHelper {
 
-    fun attemptExcavate(biw: BlockInWorld, tool: ItemStack, player: EntityPlayer) {
+    fun attemptExcavate(biw: BlockInWorld, tool: ItemStack, player: EntityPlayerMP) {
+        val preCheckEvent = VeinMinerEvent.PreToolUseCheck(biw.pos, biw.state, player, tool)
+        MinecraftForge.EVENT_BUS.post(preCheckEvent)
         if (
                 isValidTool(tool) &&
-                isValidBlock(biw.block)
-        )
+                isValidBlock(biw.block) &&
+                preCheckEvent.allowContinue
+        ) {
             harvestBlocks(biw.pos, biw.world, biw.block, biw.state, tool, player, getAlikeBlocks(biw))
+            MinecraftForge.EVENT_BUS.post(VeinMinerEvent.PostToolUse(biw.pos, biw.state, player, tool))
+        }
     }
 
-    fun isValidTool(stack: ItemStack) = tools.contains(stack.item.registryName.toString())
+    fun isValidTool(stack: ItemStack) = tools.contains(stack.item.registryName)
 
-    fun isValidBlock(block: Block) = !blockBlacklist.contains(block.registryName.toString())
+    fun isValidBlock(block: Block) = !blockBlacklist.contains(block.registryName)
 
     fun getAlikeBlocks(biw: BlockInWorld) = getAlikeBlocks(biw.pos, biw.pos, biw.world, biw.block, mutableSetOf()).toList()
 

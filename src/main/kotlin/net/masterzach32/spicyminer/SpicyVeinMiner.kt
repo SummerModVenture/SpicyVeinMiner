@@ -9,6 +9,8 @@ import net.masterzach32.spicyminer.network.ChangeModePacket
 import net.masterzach32.spicyminer.network.ClientPresentPacket
 import net.masterzach32.spicyminer.network.MinerActivatePacket
 import net.masterzach32.spicyminer.network.PingClientPacket
+import net.minecraft.client.Minecraft
+import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Mod
@@ -60,11 +62,11 @@ object SpicyVeinMiner {
 
     @Mod.EventHandler
     fun postInit(event: FMLPostInitializationEvent) {
-
+        logger.info("Spicy VeinMiner initialization finished!")
     }
 
     @Mod.EventHandler
     fun imcCallback(event: FMLInterModComms.IMCEvent) {
-        tools = tools.toMutableSet().apply { addAll(event.messages.map { it.nbtValue.getString("name") }) }.toTypedArray()
+        tools = tools.toMutableSet().apply { addAll(event.messages.map { ResourceLocation(it.nbtValue.getString("name")) }) }.toTypedArray()
     }
 }

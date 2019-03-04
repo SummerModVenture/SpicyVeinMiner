@@ -6,6 +6,8 @@ import net.minecraft.util.ResourceLocation
 
 object Tools {
 
+    // TODO: Type alias tool names
+
     fun addAllTools() {
         addToolSet("hammer", HAMMER_ARRAY)
         addToolSet("drill", DRILL_ARRAY)

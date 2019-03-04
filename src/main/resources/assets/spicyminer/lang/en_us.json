@@ -1,7 +1,12 @@
 {
   "spicyveinminer.key.category": "Spicy VeinMiner",
   "spicyveinminer.key.enable": "Toggle VeinMiner",
-  "mod.spicyveinminer.preferredmode.auto": "Spicy VeinMiner activation: Using client keybind.",
-  "mod.spicyveinminer.preferredmode.sneak": "Spicy VeinMiner activation: When sneaking.",
-  "mod.spicyveinminer.preferredmode.nosneak": "Spicy VeinMiner activation: When not sneaking."
+
+  "text.spicyveinminer.preferredmode.auto": "Spicy VeinMiner activation: Using client keybind.",
+  "text.spicyveinminer.preferredmode.sneak": "Spicy VeinMiner activation: When sneaking.",
+  "text.spicyveinminer.preferredmode.nosneak": "Spicy VeinMiner activation: When not sneaking.",
+
+  "text.spicyveinminer.command.sveinminerc.usage": "/sveinminerc disabled/pressed/sneak/no_sneak",
+
+  "spicyminer.config.general.preferredMode": "Preferred Mode"
 }

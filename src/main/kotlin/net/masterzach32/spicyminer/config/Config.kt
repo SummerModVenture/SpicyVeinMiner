@@ -10,43 +10,35 @@ import net.minecraft.init.Items
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.common.config.Config
 
-@Config.Comment(
-        "Set the preferred activator mode for the veinminer."
-)
+@Config.Comment("Set the preferred activator mode for the veinminer.")
 @JvmField
 var preferredMode: PreferredMode = PreferredMode.PRESSED
 
-@Config.Comment(
-        "How many blocks can be excavated at once."
-)
+@Config.Comment("How many blocks can be excavated at once.")
 @Config.RangeInt(min = 2, max = 200)
 @JvmField
 var limit: Int = 100
 
-@Config.Comment(
-        "How far from the initial block can blocks be excavated."
-)
+@Config.Comment("How far from the initial block can blocks be excavated.")
 @Config.RangeInt(min = 2, max = 50)
 @JvmField
 var range: Int = 20
 
-@Config.Comment(
-        "How much exhaustion the player takes for each block broken."
-)
+@Config.Comment("How much exhaustion the player takes for each block broken.")
 @JvmField
 var exhaustion: Double = 0.005
 
-@Config.Comment(
-        "Ignore whether the held tool is valid."
-)
+@Config.Comment("Ignore whether the held tool is valid.")
 @JvmField
 var ignoreTools: Boolean = false
 
-@Config.Comment(
-        "Only vanilla minecraft tools can be used to excavate."
-)
+@Config.Comment("Only vanilla minecraft tools can be used to excavate.")
 @JvmField
 var vanillaOnly: Boolean = false
+
+@Config.Comment("How many blocks can be destroyed per tick, lower amounts may reduce lag on large servers. Set to 0 for no limit.")
+@JvmField
+var blocksPerTick: Int = 200
 
 object Config {
 

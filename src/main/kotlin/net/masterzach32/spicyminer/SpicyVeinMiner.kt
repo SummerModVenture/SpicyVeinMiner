@@ -20,18 +20,6 @@ import net.minecraftforge.fml.common.network.NetworkRegistry
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper
 import net.minecraftforge.fml.relauncher.Side
 
-/*
- * SpicyVeinMiner - Created on 5/22/2018
- * Author: Zach Kozar
- * 
- * This code is licensed under the GNU GPL v3
- * You can find more info in the LICENSE file at the project root.
- */
-
-/**
- * @author Zach Kozar
- * @version 5/22/2018
- */
 @Mod(modid = MOD_ID, name = MOD_NAME, version = MOD_VERSION, modLanguageAdapter = "com.spicymemes.core.KotlinAdapter")
 object SpicyVeinMiner {
 

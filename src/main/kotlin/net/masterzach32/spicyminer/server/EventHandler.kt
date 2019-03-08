@@ -5,6 +5,7 @@ import com.spicymemes.core.util.serverOnly
 import net.masterzach32.spicyminer.MOD_ID
 import net.masterzach32.spicyminer.SpicyVeinMiner
 import net.masterzach32.spicyminer.api.VeinMinerEvent
+import net.masterzach32.spicyminer.config.blocksPerTick
 import net.masterzach32.spicyminer.logger
 import net.masterzach32.spicyminer.network.PingClientPacket
 import net.masterzach32.spicyminer.util.PlayerStatus
@@ -15,6 +16,7 @@ import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInterModComms
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.PlayerEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.time.Instant
 
 @Suppress("unused")
@@ -41,6 +43,15 @@ object EventHandler {
                 VeinMinerHelper.attemptExcavate(biw, tool, event.player as EntityPlayerMP)
             }
         }
+    }
+
+    @JvmStatic
+    @SubscribeEvent
+    fun onServerTick(event: TickEvent.ServerTickEvent) {
+        if (blocksPerTick == 0)
+            VeinMinerHelper.processAllBlocks()
+        else
+            VeinMinerHelper.processLimitedBlocks(blocksPerTick)
     }
 
     @JvmStatic

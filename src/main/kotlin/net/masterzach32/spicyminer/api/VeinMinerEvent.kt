@@ -11,7 +11,7 @@ abstract class VeinMinerEvent(
         val state: IBlockState,
         val player: EntityPlayerMP,
         val tool: ItemStack
-): Event() {
+) : Event() {
 
     /**
      * Event to check if veinmine should continue. Set allowContinue to false to cancel.

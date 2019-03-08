@@ -8,6 +8,7 @@ object IMCHelper {
 
     private const val modid = "spicyminer"
 
+    @JvmStatic
     fun addTool(type: String, name: ResourceLocation): Boolean {
         val msg = NBTTagCompound().apply {
             setString("type", type)
@@ -16,6 +17,7 @@ object IMCHelper {
         return FMLInterModComms.sendMessage(modid, "addTool", msg)
     }
 
+    @JvmStatic
     fun addBlockBlacklist(name: ResourceLocation): Boolean {
         val msg = NBTTagCompound().apply {
             setString("name", name.toString())

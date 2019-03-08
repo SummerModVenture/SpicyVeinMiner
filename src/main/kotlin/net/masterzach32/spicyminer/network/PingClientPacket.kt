@@ -7,6 +7,7 @@ import net.masterzach32.spicyminer.config.preferredMode
 import net.masterzach32.spicyminer.logger
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
+import java.time.Instant
 
 /**
  * Packet to ping the client to see if this mod is installed.
@@ -26,7 +27,7 @@ class PingClientPacket(var timestamp: Long) : IMessage {
     class Handler : GenericPacketHandler<PingClientPacket>() {
 
         override fun processMessage(message: PingClientPacket, ctx: MessageContext) {
-            logger.info("Recieved Spicy VeinMiner server ping packet.")
+            logger.info("Received ping packet from server, sending client preferred mode back.")
             SpicyVeinMiner.network.sendToServer(ClientPresentPacket(message.timestamp, preferredMode))
         }
     }

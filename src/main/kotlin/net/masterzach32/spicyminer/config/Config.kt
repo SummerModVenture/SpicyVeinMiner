@@ -37,8 +37,9 @@ var ignoreTools: Boolean = false
 var vanillaOnly: Boolean = false
 
 @Config.Comment("How many blocks can be destroyed per tick, lower amounts may reduce lag on large servers. Set to 0 for no limit.")
+@Config.RangeInt(min = 0)
 @JvmField
-var blocksPerTick: Int = 200
+var blocksPerTick: Int = 0
 
 object Config {
 

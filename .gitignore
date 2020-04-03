@@ -5,8 +5,7 @@
 .settings/
 
 # IntelliJ
-.idea/*
-!/.idea/runConfigurations
+.idea/
 out/
 *.iml
 *.iws
@@ -31,4 +30,3 @@ grav.perl
 
 # Add other files here:
 run/
-secret.json

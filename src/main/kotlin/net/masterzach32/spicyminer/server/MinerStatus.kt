@@ -4,13 +4,9 @@ import net.masterzach32.spicyminer.util.PlayerStatus
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-object PlayerManager {
+object MinerStatus {
 
     private val players = ConcurrentHashMap<UUID, PlayerStatus>()
-
-    fun addPlayer(name: UUID, status: PlayerStatus = PlayerStatus.INACTIVE) {
-        players[name] = status
-    }
 
     fun removePlayer(name: UUID) {
         players.remove(name)
@@ -18,5 +14,7 @@ object PlayerManager {
 
     fun getPlayerStatus(name: UUID) = players[name]
 
-    fun setPlayerStatus(name: UUID, status: PlayerStatus) = addPlayer(name, status)
+    fun setPlayerStatus(name: UUID, status: PlayerStatus) {
+        players[name] = status
+    }
 }

@@ -1,15 +1,9 @@
 package net.masterzach32.spicyminer
 
-import com.spicymemes.core.util.clientOnly
-import net.masterzach32.spicyminer.client.ActivateMinerKeybindManager
-import net.masterzach32.spicyminer.client.ChangeModeCommand
-import net.masterzach32.spicyminer.config.Config
-import net.masterzach32.spicyminer.config.ToolType
-import net.masterzach32.spicyminer.config.Tools
-import net.masterzach32.spicyminer.network.ChangeModePacket
-import net.masterzach32.spicyminer.network.ClientPresentPacket
-import net.masterzach32.spicyminer.network.MinerActivatePacket
-import net.masterzach32.spicyminer.network.PingClientPacket
+import com.spicymemes.core.util.*
+import net.masterzach32.spicyminer.client.*
+import net.masterzach32.spicyminer.config.*
+import net.masterzach32.spicyminer.network.*
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.common.MinecraftForge
@@ -55,10 +49,10 @@ object SpicyVeinMiner {
 
     @Mod.EventHandler
     fun imcCallback(event: FMLInterModComms.IMCEvent) {
-        event.messages
+        event.messages.asSequence()
                 .filter { it.key == "addTool" }
-                .distinctBy { it.nbtValue.getString("type") }
                 .map { ToolType(it.nbtValue.getString("type")) }
+                .distinct()
                 .forEach { toolType ->
                     val toolsToAdd = event.messages
                             .map { it.nbtValue }

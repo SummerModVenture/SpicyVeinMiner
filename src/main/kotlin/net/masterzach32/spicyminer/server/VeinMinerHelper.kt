@@ -6,6 +6,7 @@ import com.spicymemes.core.util.getBlock
 import com.spicymemes.core.util.getBlocksWithin
 import net.masterzach32.spicyminer.api.VeinMinerEvent
 import net.masterzach32.spicyminer.config.*
+import net.masterzach32.spicyminer.extensions.*
 import net.masterzach32.spicyminer.util.DropSet
 import net.minecraft.block.Block
 import net.minecraft.block.state.IBlockState
@@ -28,7 +29,7 @@ object VeinMinerHelper {
 
     fun attemptExcavate(biw: BlockInWorld, tool: ItemStack?, player: EntityPlayerMP) {
         if (biw.world.isRemote)
-            throw Exception("VeinMinerHelper#attemptExcavate() must be run on the server!")
+            throw IllegalStateException("VeinMinerHelper#attemptExcavate() must be run on the server!")
         if (tool == null)
             return
 
@@ -39,7 +40,7 @@ object VeinMinerHelper {
                 isValidBlock(biw.block) &&
                 preCheckEvent.allowContinue
         ) {
-            instances.add(VeinMinerInstance(biw.pos, biw.world, biw.state, tool, player, getAlikeBlocks(biw)))
+            instances.add(VeinMinerInstance(biw.pos, biw.world, biw.state, player, tool, getAlikeBlocks(biw, player.minerData.blockLimit)))
         }
     }
 
@@ -67,8 +68,8 @@ object VeinMinerHelper {
         }
     }
 
-    private fun getAlikeBlocks(biw: BlockInWorld): Set<BlockPos> {
-        return mutableSetOf<BlockPos>().also { getAlikeBlocks(biw.pos, biw.pos, biw.world, biw.block, it) }
+    private fun getAlikeBlocks(biw: BlockInWorld, playerLimit: Int): Set<BlockPos> {
+        return mutableSetOf<BlockPos>().also { getAlikeBlocks(biw.pos, biw.pos, biw.world, biw.block, it, playerLimit) }
     }
 
     private fun getAlikeBlocks(
@@ -76,28 +77,31 @@ object VeinMinerHelper {
             pos: BlockPos,
             world: World,
             block: Block,
-            blocks: MutableSet<BlockPos>
+            blocks: MutableSet<BlockPos>,
+            playerLimit: Int
     ) {
         pos.getBlocksWithin(1).asSequence()
                 .filter { world.getBlock(it).block.unlocalizedName == block.unlocalizedName }
                 .filter { origin.distance(it) < range }
-                .filter { blocks.size <= limit && blocks.add(it) }
-                .forEach { getAlikeBlocks(origin, it, world, block, blocks) }
+                .filter { blocks.size <= playerLimit && blocks.add(it) }
+                .forEach { getAlikeBlocks(origin, it, world, block, blocks, playerLimit) }
     }
 
     class VeinMinerInstance(
             private val origin: BlockPos,
             private val world: World,
             private val state: IBlockState,
-            private val tool: ItemStack,
             private val player: EntityPlayerMP,
+            private val tool: ItemStack,
             blocks: Set<BlockPos>
     ) {
 
-        private val queue = ConcurrentLinkedQueue<BlockPos>(blocks)
+        private val queue = ConcurrentLinkedQueue(blocks)
         private val drops = DropSet()
 
         val isFinished get() = queue.peek() == null || tool.isEmpty
+
+        private var count = 0
 
         fun harvestNextBlock(): Boolean {
             val nextPos = queue.poll()
@@ -111,6 +115,7 @@ object VeinMinerHelper {
             tool.damageItem(1, player)
             player.addExhaustion(exhaustion.toFloat())
             state.block.dropXpOnBlockBreak(world, origin, state.block.getExpDrop(state, world, nextPos, fortune))
+            count++
             return !isFinished
         }
 
@@ -118,7 +123,9 @@ object VeinMinerHelper {
             if (!isFinished)
                 throw IllegalStateException("VeinMinerInstance#cleanup() was called early!")
             drops.getDrops().forEach { Block.spawnAsEntity(world, origin, it) }
-            MinecraftForge.EVENT_BUS.post(VeinMinerEvent.PostToolUse(origin, state, player, tool))
+            val pre = player.minerData
+            player.addBlocksMined(count)
+            MinecraftForge.EVENT_BUS.post(VeinMinerEvent.PostToolUse(origin, state, player, tool, pre))
         }
     }
 }

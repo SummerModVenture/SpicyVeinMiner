@@ -8,6 +8,8 @@ object IMCHelper {
 
     private const val modid = "spicyminer"
 
+    internal val messages = listOf("addTool", "addBlockBlacklist")
+
     @JvmStatic
     fun addTool(type: String, name: ResourceLocation): Boolean {
         val msg = NBTTagCompound().apply {

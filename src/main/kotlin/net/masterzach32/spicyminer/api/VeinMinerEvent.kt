@@ -1,5 +1,6 @@
 package net.masterzach32.spicyminer.api
 
+import net.masterzach32.spicyminer.server.player.PlayerData
 import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.player.EntityPlayerMP
 import net.minecraft.item.ItemStack
@@ -31,6 +32,7 @@ abstract class VeinMinerEvent(
             pos: BlockPos,
             state: IBlockState,
             player: EntityPlayerMP,
-            tool: ItemStack
+            tool: ItemStack,
+            val minerDataPre: PlayerData
     ) : VeinMinerEvent(pos, state, player, tool)
 }

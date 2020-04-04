@@ -1,0 +1,21 @@
+modLoader="javafml"
+loaderVersion="[31,)"
+issueTrackerURL="http://my.issue.tracker/"
+
+[[mods]]
+
+modId="spicyminer"
+version="${file.jarVersion}"
+displayName="Spicy VeinMiner"
+credits="Dank memes"
+authors="Zach Kozar"
+description='''
+	Veinminer, but spicy
+'''
+
+[[dependencies.spicyminer]]
+    modId="spicycore"
+    mandatory=true
+    versionRange="[2,)"
+    ordering="BEFORE"
+    side="BOTH"

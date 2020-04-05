@@ -12,12 +12,29 @@ plugins {
     id "org.jetbrains.kotlin.jvm" version "1.3.71"
 }
 apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'java'
 
 version = "${project.mod_version}"
 group = "${project.group_name}"
 archivesBaseName = "${project.archive_name}"
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
+
+sourceSets {
+    api {
+        kotlin {
+            srcDir 'src/api/kotlin'
+        }
+    }
+    main {
+        compileClasspath += sourceSets.api.output
+        runtimeClasspath += sourceSets.api.output
+    }
+    test {
+        compileClasspath += sourceSets.api.output
+        runtimeClasspath += sourceSets.api.output
+    }
+}
 
 minecraft {
     // The mappings can be changed at any time, and must be in the following format.
@@ -36,15 +53,27 @@ minecraft {
         client {
             workingDirectory project.file('run')
 
-            // Recommended logging data for a userdev environment
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
-            // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
+            properties 'fml.earlyprogresswindow': 'false'
+
+            if (project.hasProperty('mc_uuid')) {
+                //Your uuid without any dashes in the middle
+                args '--uuid', project.getProperty('mc_uuid')
+            }
+            if (project.hasProperty('mc_username')) {
+                //Your username/display name, this is the name that shows up in chat
+                // Note: This is not your email, even if you have a Mojang account
+                args '--username', project.getProperty('mc_username')
+            }
+            if (project.hasProperty('mc_accessToken')) {
+                //Your access token, you can find it in your '.minecraft/launcher_profiles.json' file
+                args '--accessToken', project.getProperty('mc_accessToken')
+            }
 
             mods {
                 spicyminer {
-                    source sourceSets.main
+                    sources(sourceSets.main, sourceSets.api)
                 }
                 spicycore {
                     source project(":core").sourceSets.main
@@ -63,7 +92,7 @@ minecraft {
 
             mods {
                 spicyminer {
-                    source sourceSets.main
+                    sources(sourceSets.main, sourceSets.api)
                 }
                 spicycore {
                     source project(":core").sourceSets.main
@@ -80,11 +109,11 @@ minecraft {
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
 
-            args '--mod', 'spicycore', '--all', '--output', file('src/generated/resources/')
+            args '--mod', 'spicyminer', '--all', '--output', file('src/generated/resources/')
 
             mods {
                 spicyminer {
-                    source sourceSets.main
+                    sources(sourceSets.main, sourceSets.api)
                 }
                 spicycore {
                     source project(":core").sourceSets.main
@@ -97,12 +126,28 @@ minecraft {
 repositories {
     mavenCentral()
     jcenter()
+    maven {
+        name 'JEI'
+        url "https://dvs1.progwml6.com/files/maven"
+    }
+    maven {
+        name 'HWYLA'
+        url "https://tehnut.info/maven"
+    }
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.15.2-31.1.0'
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
     compile project(":core")
+
+    compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}:api")
+    runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}")
+
+    compileOnly fg.deobf("mcp.mobius.waila:Hwyla:${hwyla_version}:api")
+    runtimeOnly fg.deobf("mcp.mobius.waila:Hwyla:${hwyla_version}")
+
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 }
 
 compileKotlin {
@@ -115,7 +160,6 @@ compileTestKotlin {
         jvmTarget = "1.8"
     }
 }
-
 
 jar {
     manifest {

@@ -15,7 +15,7 @@ open class ChangeModePacket(val mode: PreferredMode) : SpicyPacket {
         override fun process(packet: ChangeModePacket, ctx: NetworkEvent.Context) {
             logger.debug("Changing preferredMode to ${packet.mode}.")
 
-            preferredMode = packet.mode
+            ClientConfig.preferredMode.set(packet.mode)
         }
 
         override fun encode(packet: ChangeModePacket, buf: PacketBuffer) {

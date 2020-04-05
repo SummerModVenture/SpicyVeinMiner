@@ -49,15 +49,15 @@ object VeinMinerHelper {
                             world,
                             player,
                             tool,
-                            getAlikeBlocks(event.pos, world, event.state.block, player.minerData.blockLimit)
+                            getAlikeBlocks(event.pos, world, event.state.block, player.minerData.blockLimit, ServerConfig.range.get())
                     )
             )
         }
     }
 
-    fun isValidTool(stack: ItemStack) = Config.registeredTools.any { it.value.contains(stack.item.registryName) }
+    fun isValidTool(stack: ItemStack) = ServerConfig.allowedToolsSet.contains(stack.item.registryName)
 
-    fun isValidBlock(block: Block) = Config.registeredBlocks.contains(block.registryName)
+    fun isValidBlock(block: Block) = ServerConfig.allowedBlocksSet.contains(block.registryName)
 
     fun processLimitedBlocks(limit: Int) {
         var i = 0
@@ -81,8 +81,8 @@ object VeinMinerHelper {
         }
     }
 
-    private fun getAlikeBlocks(originPos: BlockPos, world: World, block: Block, playerLimit: Int): Set<BlockPos> {
-        return mutableSetOf<BlockPos>().also { getAlikeBlocks(originPos, originPos, world, block, it, playerLimit) }
+    private fun getAlikeBlocks(originPos: BlockPos, world: World, block: Block, playerLimit: Int, range: Int): Set<BlockPos> {
+        return mutableSetOf<BlockPos>().also { getAlikeBlocks(originPos, originPos, world, block, it, playerLimit, range) }
     }
 
     private fun getAlikeBlocks(
@@ -91,13 +91,14 @@ object VeinMinerHelper {
             world: World,
             block: Block,
             blocks: MutableSet<BlockPos>,
-            playerLimit: Int
+            playerLimit: Int,
+            range: Int
     ) {
         pos.getBlocksWithinMutable(1)
                 .filter { world.getBlock(it).block.registryName == block.registryName }
                 .filter { origin.distance(it) < range }
                 .filter { blocks.size <= playerLimit && blocks.add(it.toImmutable()) }
-                .forEach { getAlikeBlocks(origin, it, world, block, blocks, playerLimit) }
+                .forEach { getAlikeBlocks(origin, it, world, block, blocks, playerLimit, range) }
     }
 
     class VeinMinerInstance(
@@ -111,6 +112,8 @@ object VeinMinerHelper {
 
         private val queue = ConcurrentLinkedQueue(blocks)
         private val drops = DropSet()
+
+        private val exhaustion = ServerConfig.exhaustion.get()
 
         val isFinished get() = queue.peek() == null || tool.isEmpty
 

@@ -16,7 +16,7 @@ class PingClientPacket(val timestamp: Long) : SpicyPacket {
 
         override fun process(packet: PingClientPacket, ctx: NetworkEvent.Context) {
             logger.info("Received ping packet from server, sending client preferred mode back.")
-            Network.mainChannel.sendToServer(ClientPresentPacket(packet.timestamp, preferredMode))
+            Network.mainChannel.sendToServer(ClientPresentPacket(packet.timestamp, ClientConfig.preferredMode.get()))
         }
 
         override fun encode(packet: PingClientPacket, buf: PacketBuffer) {

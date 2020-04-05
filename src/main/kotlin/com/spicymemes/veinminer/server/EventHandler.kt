@@ -54,7 +54,6 @@ object EventHandler {
             var activate = false
 
             val status = MinerStatus.getForPlayer(event.player)
-            logger.debug(status)
             if (status == PlayerStatus.ACTIVE)
                 activate = true
             else if (status == PlayerStatus.SNEAK_ACTIVE && event.player.isCrouching)
@@ -70,10 +69,12 @@ object EventHandler {
     @JvmStatic
     @SubscribeEvent
     fun onServerTick(event: TickEvent.ServerTickEvent) {
-        if (blocksPerTick == 0)
-            VeinMinerHelper.processAllBlocks()
-        else
-            VeinMinerHelper.processLimitedBlocks(blocksPerTick)
+        ServerConfig.blocksPerTick.get().let { blocksPerTick ->
+            if (blocksPerTick == 0)
+                VeinMinerHelper.processAllBlocks()
+            else
+                VeinMinerHelper.processLimitedBlocks(blocksPerTick)
+        }
     }
 
     @JvmStatic

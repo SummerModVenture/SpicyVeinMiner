@@ -1,12 +1,17 @@
 package com.spicymemes.veinminer.config
 
+import com.spicymemes.core.util.*
 import com.spicymemes.veinminer.api.*
 import net.minecraft.block.*
 
 object WhitelistBlocks {
 
     fun addDefaultBlocks() {
-        VANILLA_BLOCKS.forEach { IMCHelper.addBlockWhitelist(it) }
+        VANILLA_BLOCKS.forEach {
+            ifModLoaded(it.namespace) {
+                IMCHelper.addBlockWhitelist(it)
+            }
+        }
     }
 
     val VANILLA_BLOCKS = listOf(

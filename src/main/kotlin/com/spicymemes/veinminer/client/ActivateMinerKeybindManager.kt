@@ -22,6 +22,7 @@ object ActivateMinerKeybindManager {
 
     @SubscribeEvent
     fun onKeyPressed(event: InputEvent) {
+        val preferredMode = ClientConfig.preferredMode.get()
         if (preferredMode != PreferredMode.PRESSED && preferredMode != PreferredMode.RELEASED)
             return
 

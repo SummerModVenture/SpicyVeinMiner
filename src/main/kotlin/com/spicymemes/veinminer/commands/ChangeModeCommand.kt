@@ -12,7 +12,7 @@ import net.minecraft.util.text.*
 object ChangeModeCommand {
 
     fun register(dispatcher: CommandDispatcher<CommandSource>) {
-        val literalArgumentBuilder = Commands.literal("sveinminerc").requires { it.hasPermissionLevel(1) }
+        val literalArgumentBuilder = Commands.literal("veinminer").requires { it.hasPermissionLevel(1) }
 
         for (mode in PreferredMode.values()) {
             literalArgumentBuilder.then(Commands.literal(mode.codeName).executes {
@@ -28,11 +28,8 @@ object ChangeModeCommand {
     }
 
     private fun setPreferredMode(source: CommandContext<CommandSource>, player: ServerPlayerEntity, newMode: PreferredMode): Int {
-        if (preferredMode != newMode) {
-            player.setPreferredMode(newMode)
-            sendFeedback(player, newMode)
-            return 1
-        } else
-            return 0
+        player.setPreferredMode(newMode)
+        sendFeedback(player, newMode)
+        return 1
     }
 }

@@ -7,7 +7,9 @@ import com.spicymemes.veinminer.extensions.*
 import com.spicymemes.veinminer.network.*
 import net.minecraftforge.common.*
 import net.minecraftforge.eventbus.api.SubscribeEvent
+import net.minecraftforge.fml.*
 import net.minecraftforge.fml.common.Mod
+import net.minecraftforge.fml.config.*
 import net.minecraftforge.fml.event.lifecycle.*
 import org.apache.logging.log4j.LogManager
 
@@ -15,7 +17,14 @@ import org.apache.logging.log4j.LogManager
 @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 class SpicyVeinMiner {
 
+    init {
+        container = ModLoadingContext.get().activeContainer
+        Config.register()
+    }
+
     companion object {
+
+        lateinit var container: ModContainer
 
         @SubscribeEvent
         @JvmStatic
@@ -27,7 +36,7 @@ class SpicyVeinMiner {
         @SubscribeEvent
         @JvmStatic
         fun setupClient(event: FMLClientSetupEvent) {
-            MinecraftForge.EVENT_BUS.register(ActivateMinerKeybindManager)
+            MinerClient.init()
         }
 
         @SubscribeEvent
@@ -47,14 +56,17 @@ class SpicyVeinMiner {
         @JvmStatic
         fun processIMC(event: InterModProcessEvent) {
             event.getMessagesOf(AddToolMessage)
-                    .groupBy { (msg, obj) -> obj.toolType }
-                    .mapValues { (toolType, msgs) -> msgs.map { (msg, obj) -> obj.tool } }
+                    .groupBy { (_, obj) -> obj.toolType }
+                    .mapValues { (_, msgs) -> msgs.map { (msg, obj) -> obj.tool } }
                     .forEach { (toolType, tools) ->
-                        logger.info("Adding ${tools.size} tools from IMC to toolType=${toolType.name}.")
-                        Config.addTools(toolType, tools)
+                        logger.info("Adding ${tools.size} tools from IMC for tool type ${toolType.name}.")
+                        ServerConfig.addTools(tools.toSet())
                     }
             event.getMessagesOf(AddBlockMessage)
-                    .forEach { (msg, obj) -> Config.addBlock(obj.name) }
+                    .forEach { (msg, obj) ->
+                        logger.info("${msg.modId} adding block from IMC to veinminer whitelist: ${obj.name}")
+                        ServerConfig.addBlock(obj.name)
+                    }
         }
     }
 }

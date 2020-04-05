@@ -10,5 +10,8 @@
 
   "text.spicyveinminer.command.sveinminerc.usage": "/sveinminerc disabled/pressed/sneak/no_sneak",
 
-  "spicyminer.config.general.preferredMode": "Preferred Mode"
+  "spicyminer.config.general.preferredMode": "Preferred Mode",
+
+  "gui.spicyminer.configuration": "Spicy VeinMiner Configuration",
+  "gui.spicyminer.done": "Done"
 }

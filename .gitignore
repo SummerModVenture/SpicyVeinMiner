@@ -31,3 +31,4 @@ grav.perl
 
 # Add other files here:
 run/
+logs/

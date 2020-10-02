@@ -1,7 +1,6 @@
 package com.spicymemes.veinminer.server
 
 import com.spicymemes.core.extensions.*
-import com.spicymemes.core.util.*
 import com.spicymemes.veinminer.*
 import com.spicymemes.veinminer.api.*
 import com.spicymemes.veinminer.config.*
@@ -11,7 +10,6 @@ import net.minecraft.block.*
 import net.minecraft.enchantment.*
 import net.minecraft.entity.player.*
 import net.minecraft.item.*
-import net.minecraft.util.*
 import net.minecraft.util.math.*
 import net.minecraft.world.*
 import net.minecraft.world.server.*
@@ -35,8 +33,7 @@ object VeinMinerHelper {
 
         val preCheckEvent = VeinMinerEvent.PreToolUseCheck(event.pos, event.state, event.player, tool)
         MinecraftForge.EVENT_BUS.post(preCheckEvent)
-        if (
-                isValidTool(tool) &&
+        if (isValidTool(tool) &&
                 isValidBlock(event.state.block) &&
                 preCheckEvent.allowContinue &&
                 !preCheckEvent.isCanceled
@@ -49,13 +46,20 @@ object VeinMinerHelper {
                             world,
                             player,
                             tool,
-                            getAlikeBlocks(event.pos, world, event.state.block, player.minerData.blockLimit, ServerConfig.range.get())
+                            getAlikeBlocks(
+                                    event.pos,
+                                    world,
+                                    event.state.block,
+                                    player.minerData.blockLimit,
+                                    ServerConfig.range.get()
+                            )
                     )
             )
         }
     }
 
-    fun isValidTool(stack: ItemStack) = ServerConfig.allowedToolsSet.contains(stack.item.registryName)
+    fun isValidTool(stack: ItemStack) = ServerConfig.ignoreTools.get() ||
+            ServerConfig.allowedToolsSet.contains(stack.item.registryName)
 
     fun isValidBlock(block: Block) = ServerConfig.allowedBlocksSet.contains(block.registryName)
 
@@ -64,7 +68,9 @@ object VeinMinerHelper {
         while (instances.peek() != null && i < limit) {
             val instance = instances.peek()
             if (!instance.isFinished)
-                while (instance.harvestNextBlock() && i < limit) { i++ }
+                while (instance.harvestNextBlock() && i < limit) {
+                    i++
+                }
             if (instance.isFinished) {
                 instance.cleanup()
                 instances.remove()
@@ -76,7 +82,8 @@ object VeinMinerHelper {
         while (instances.peek() != null) {
             val instance = instances.poll()
             if (!instance.isFinished)
-                while (instance.harvestNextBlock()) {}
+                while (instance.harvestNextBlock()) {
+                }
             instance.cleanup()
         }
     }
@@ -96,8 +103,7 @@ object VeinMinerHelper {
     ) {
         pos.getBlocksWithinMutable(1)
                 .filter { world.getBlock(it).block.registryName == block.registryName }
-                .filter { origin.distance(it) < range }
-                .filter { blocks.size <= playerLimit && blocks.add(it.toImmutable()) }
+                .filter { origin.distance(it) < range && blocks.size <= playerLimit && blocks.add(it.toImmutable()) }
                 .forEach { getAlikeBlocks(origin, it, world, block, blocks, playerLimit, range) }
     }
 
@@ -113,9 +119,11 @@ object VeinMinerHelper {
         private val queue = ConcurrentLinkedQueue(blocks)
         private val drops = DropSet()
 
-        private val exhaustion = ServerConfig.exhaustion.get()
+        private val wasToolUse = !tool.isEmpty
+        private val exhaustion = ServerConfig.exhaustion.get() *
+                if (wasToolUse) 1.0 else ServerConfig.exhaustionMultiplier.get()
 
-        val isFinished get() = queue.peek() == null || tool.isEmpty
+        val isFinished get() = queue.peek() == null || (wasToolUse && tool.isEmpty)
 
         private var count = 0
 
@@ -144,7 +152,7 @@ object VeinMinerHelper {
                 throw IllegalStateException("VeinMinerInstance#cleanup() was called early!")
             drops.getDrops().forEach { Block.spawnAsEntity(world, originPos, it) }
             MinecraftForge.EVENT_BUS.post(VeinMinerEvent.PostToolUse(originPos, state, player, tool, player.minerData))
-            player.addBlocksMined(count+1)
+            player.addBlocksMined(count + 1)
         }
     }
 }

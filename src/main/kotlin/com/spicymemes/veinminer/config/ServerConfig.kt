@@ -11,6 +11,7 @@ object ServerConfig {
     val blocksPerTick: ForgeConfigSpec.IntValue
     val range: ForgeConfigSpec.IntValue
     val exhaustion: ForgeConfigSpec.DoubleValue
+    val exhaustionMultiplier: ForgeConfigSpec.DoubleValue
     val ignoreTools: ForgeConfigSpec.BooleanValue
 
     val allowedTools: ForgeConfigSpec.ConfigValue<List<String>>
@@ -39,7 +40,10 @@ object ServerConfig {
                 .defineInRange("range", 20, 2, 50)
         exhaustion = configBuilder
                 .comment("How much exhaustion the player takes for each block broken.")
-                .defineInRange("exhaustion", 0.005, 0.0, 1.0)
+                .defineInRange("exhaustion", 0.01, 0.0, 1.0)
+        exhaustionMultiplier = configBuilder
+                .comment("How much exhaustion is multiplied when player doesn't use a tool.")
+                .defineInRange("exhaustionMultiplier", 3.0, 1.0, 5.0)
         ignoreTools = configBuilder
                 .comment("Ignore whether the held tool is valid.")
                 .define("ignoreTools", false)

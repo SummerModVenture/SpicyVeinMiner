@@ -18,6 +18,7 @@ import org.apache.logging.log4j.LogManager
 class SpicyVeinMiner {
 
     init {
+        logger = LogManager.getLogger("SpicyMiner")
         container = ModLoadingContext.get().activeContainer
         Config.register()
     }
@@ -62,6 +63,7 @@ class SpicyVeinMiner {
                         logger.info("Adding ${tools.size} tools from IMC for tool type ${toolType.name}.")
                         ServerConfig.addTools(tools.toSet())
                     }
+
             event.getMessagesOf(AddBlockMessage)
                     .forEach { (msg, obj) ->
                         logger.info("${msg.modId} adding block from IMC to veinminer whitelist: ${obj.name}")

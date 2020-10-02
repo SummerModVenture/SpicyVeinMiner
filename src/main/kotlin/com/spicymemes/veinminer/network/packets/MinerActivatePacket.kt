@@ -9,7 +9,7 @@ import net.minecraftforge.fml.network.*
 
 class MinerActivatePacket(val keyActive: Boolean) : SpicyPacket {
 
-    object Handler : SpicyPacketHandler<MinerActivatePacket> {
+    companion object Handler : SpicyPacketHandler<MinerActivatePacket> {
 
         override fun process(packet: MinerActivatePacket, ctx: NetworkEvent.Context) {
             val player = ctx.sender!!

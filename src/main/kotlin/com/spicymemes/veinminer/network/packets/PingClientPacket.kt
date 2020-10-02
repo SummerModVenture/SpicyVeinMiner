@@ -3,6 +3,7 @@ package com.spicymemes.veinminer.network.packets
 import com.spicymemes.core.network.*
 import com.spicymemes.veinminer.config.*
 import com.spicymemes.veinminer.*
+import com.spicymemes.veinminer.client.*
 import com.spicymemes.veinminer.network.Network
 import net.minecraft.network.*
 import net.minecraftforge.fml.network.*
@@ -12,10 +13,11 @@ import net.minecraftforge.fml.network.*
  */
 class PingClientPacket(val timestamp: Long) : SpicyPacket {
 
-    object Handler : SpicyPacketHandler<PingClientPacket> {
+    companion object Handler : SpicyPacketHandler<PingClientPacket> {
 
         override fun process(packet: PingClientPacket, ctx: NetworkEvent.Context) {
             logger.info("Received ping packet from server, sending client preferred mode back.")
+            ActivateMinerKeybindManager.joinedServer = true
             Network.mainChannel.sendToServer(ClientPresentPacket(packet.timestamp, ClientConfig.preferredMode.get()))
         }
 

@@ -13,6 +13,7 @@ import net.minecraftforge.fml.client.registry.*
 @OnlyIn(Dist.CLIENT)
 object ActivateMinerKeybindManager {
 
+    var joinedServer = false
     private var statusEnabled = false
     private val activateKey = KeyBinding("spicyveinminer.key.enable", 96, "spicyveinminer.key.category")
 
@@ -23,7 +24,7 @@ object ActivateMinerKeybindManager {
     @SubscribeEvent
     fun onKeyPressed(event: InputEvent) {
         val preferredMode = ClientConfig.preferredMode.get()
-        if (preferredMode != PreferredMode.PRESSED && preferredMode != PreferredMode.RELEASED)
+        if (!joinedServer || (preferredMode != PreferredMode.PRESSED && preferredMode != PreferredMode.RELEASED))
             return
 
         var sendPacket = false

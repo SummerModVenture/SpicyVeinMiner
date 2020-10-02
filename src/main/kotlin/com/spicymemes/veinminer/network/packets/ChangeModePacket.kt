@@ -10,7 +10,7 @@ import net.minecraftforge.fml.network.NetworkEvent
 
 open class ChangeModePacket(val mode: PreferredMode) : SpicyPacket {
 
-    object Handler : SpicyPacketHandler<ChangeModePacket> {
+    companion object Handler : SpicyPacketHandler<ChangeModePacket> {
 
         override fun process(packet: ChangeModePacket, ctx: NetworkEvent.Context) {
             logger.debug("Changing preferredMode to ${packet.mode}.")

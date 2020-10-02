@@ -8,9 +8,7 @@ class DropSet {
 
     fun addDrop(stack: ItemStack) {
         drops.asSequence()
-                .filter { it.item == stack.item }
-                //.filter { it.metadata == stack.metadata } // not needed anymore?
-                .filter { it.isStackable }
+                .filter { it.item == stack.item && it.isStackable }
                 .filter { it.count + stack.count <= it.maxStackSize }
                 .toList()
                 .let {

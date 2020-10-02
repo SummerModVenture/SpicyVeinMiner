@@ -5,7 +5,6 @@ import net.minecraftforge.common.*
 import net.minecraftforge.fml.config.*
 import net.minecraftforge.fml.loading.*
 
-
 object Config {
 
     val configDir = FMLPaths.getOrCreateGameRelativePath(FMLPaths.CONFIGDIR.get().resolve(MOD_ID), MOD_NAME)

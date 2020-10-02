@@ -34,7 +34,7 @@ object EventHandler {
     @SubscribeEvent
     fun onPlayerConnected(event: PlayerEvent.PlayerLoggedInEvent) {
         Network.mainChannel.send(
-                PacketDistributor.PLAYER.with { event.player as ServerPlayerEntity },
+                PacketDistributor.PLAYER.with { event.player.toServerPlayerEntity() },
                 PingClientPacket(Instant.now().toEpochMilli())
         )
         MinerDataStorage.get(event.player.world).initializePlayer(event.player)

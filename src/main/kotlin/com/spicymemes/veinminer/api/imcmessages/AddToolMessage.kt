@@ -6,7 +6,5 @@ import net.minecraft.util.*
 
 data class AddToolMessage(val toolType: ToolType, val tool: ResourceLocation) {
 
-    companion object : SpicyIMCMessageType<AddToolMessage> {
-        override val method = "addTool"
-    }
+    companion object : SpicyIMCMessageType<AddToolMessage>("addTool")
 }

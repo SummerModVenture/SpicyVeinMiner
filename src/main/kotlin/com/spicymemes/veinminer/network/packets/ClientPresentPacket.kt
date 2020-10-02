@@ -13,7 +13,7 @@ import java.time.*
  */
 class ClientPresentPacket(val timestamp: Long, val mode: PreferredMode) : SpicyPacket {
 
-    object Handler : SpicyPacketHandler<ClientPresentPacket> {
+    companion object Handler : SpicyPacketHandler<ClientPresentPacket> {
 
         override fun process(packet: ClientPresentPacket, ctx: NetworkEvent.Context) {
             val player = ctx.sender!!

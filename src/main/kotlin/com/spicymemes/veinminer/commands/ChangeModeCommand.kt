@@ -24,10 +24,17 @@ object ChangeModeCommand {
     }
 
     private fun sendFeedback(player: ServerPlayerEntity, newMode: PreferredMode) {
-        player.sendMessage(TranslationTextComponent("commands.spicyminer.sveinminerc.success.${newMode.codeName}"))
+        player.sendMessage(
+                TranslationTextComponent("commands.spicyminer.command.success.${newMode.codeName}"),
+                player.uniqueID
+        )
     }
 
-    private fun setPreferredMode(source: CommandContext<CommandSource>, player: ServerPlayerEntity, newMode: PreferredMode): Int {
+    private fun setPreferredMode(
+            source: CommandContext<CommandSource>,
+            player: ServerPlayerEntity,
+            newMode: PreferredMode
+    ): Int {
         player.setPreferredMode(newMode)
         sendFeedback(player, newMode)
         return 1

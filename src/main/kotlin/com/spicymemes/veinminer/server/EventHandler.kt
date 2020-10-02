@@ -10,13 +10,11 @@ import com.spicymemes.veinminer.extensions.*
 import com.spicymemes.veinminer.network.*
 import com.spicymemes.veinminer.network.packets.*
 import com.spicymemes.veinminer.util.*
-import net.minecraft.entity.player.*
 import net.minecraftforge.event.*
 import net.minecraftforge.event.entity.player.*
 import net.minecraftforge.event.world.*
 import net.minecraftforge.eventbus.api.*
 import net.minecraftforge.fml.common.*
-import net.minecraftforge.fml.event.server.*
 import net.minecraftforge.fml.network.*
 import java.time.*
 
@@ -26,8 +24,8 @@ object EventHandler {
 
     @JvmStatic
     @SubscribeEvent
-    fun onServerStart(event: FMLServerStartingEvent) {
-        ModCommands.registerAll(event.commandDispatcher)
+    fun onServerStart(event: RegisterCommandsEvent) {
+        ModCommands.registerAll(event.dispatcher)
     }
 
     @JvmStatic

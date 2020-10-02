@@ -2,11 +2,11 @@
   "spicyveinminer.key.category": "Spicy VeinMiner",
   "spicyveinminer.key.enable": "Toggle VeinMiner",
 
-  "commands.spicyminer.sveinminerc.success.key_pressed": "Spicy VeinMiner activation: When keybind pressed.",
-  "commands.spicyminer.sveinminerc.success.key_released": "Spicy VeinMiner activation: When keybind released.",
-  "commands.spicyminer.sveinminerc.success.sneak_active": "Spicy VeinMiner activation: While sneaking.",
-  "commands.spicyminer.sveinminerc.success.sneak_inactive": "Spicy VeinMiner activation: While not sneaking.",
-  "commands.spicyminer.sveinminerc.success.disabled": "Spicy VeinMiner activation: Disabled",
+  "commands.spicyminer.command.success.key_pressed": "Spicy VeinMiner activation: When keybind pressed.",
+  "commands.spicyminer.command.success.key_released": "Spicy VeinMiner activation: When keybind released.",
+  "commands.spicyminer.command.success.sneak_active": "Spicy VeinMiner activation: While sneaking.",
+  "commands.spicyminer.command.success.sneak_inactive": "Spicy VeinMiner activation: While not sneaking.",
+  "commands.spicyminer.command.success.disabled": "Spicy VeinMiner activation: Disabled",
 
   "text.spicyveinminer.command.sveinminerc.usage": "/sveinminerc disabled/pressed/sneak/no_sneak",
 

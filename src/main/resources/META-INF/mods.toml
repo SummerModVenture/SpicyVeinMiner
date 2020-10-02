@@ -1,6 +1,6 @@
 modLoader="javafml"
-loaderVersion="[31,)"
-issueTrackerURL="http://my.issue.tracker/"
+loaderVersion="[34,)"
+license="All rights reserved"
 
 [[mods]]
 
@@ -16,6 +16,6 @@ description='''
 [[dependencies.spicyminer]]
     modId="spicycore"
     mandatory=true
-    versionRange="[2,)"
+    versionRange="[1.16.3-2.0,)"
     ordering="BEFORE"
     side="BOTH"

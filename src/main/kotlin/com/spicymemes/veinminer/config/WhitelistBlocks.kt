@@ -23,6 +23,7 @@ object WhitelistBlocks {
             Blocks.LAPIS_ORE,
             Blocks.REDSTONE_ORE,
             Blocks.NETHER_QUARTZ_ORE,
+            Blocks.NETHER_GOLD_ORE,
             Blocks.GLOWSTONE,
             Blocks.ACACIA_LOG,
             Blocks.BIRCH_LOG,

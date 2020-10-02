@@ -4,11 +4,9 @@ import com.spicymemes.veinminer.*
 import net.minecraft.entity.player.*
 import net.minecraft.nbt.*
 import net.minecraft.world.*
-import net.minecraft.world.dimension.*
 import net.minecraft.world.storage.*
 import java.util.*
 import java.util.concurrent.*
-import java.util.function.Supplier
 
 class MinerDataStorage(name: String = ID) : WorldSavedData(ID) {
 
@@ -55,7 +53,7 @@ class MinerDataStorage(name: String = ID) : WorldSavedData(ID) {
         val ID = "${MOD_ID}_SpicyMinerPlayerData"
 
         fun get(world: World): MinerDataStorage {
-            return world.server!!.getWorld(DimensionType.OVERWORLD).savedData.getOrCreate({ MinerDataStorage() }, ID)
+            return world.server!!.getWorld(World.OVERWORLD)!!.savedData.getOrCreate({ MinerDataStorage() }, ID)
         }
     }
 }

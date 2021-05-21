@@ -11,7 +11,7 @@ class GuiConfig(private val parent: Screen) : Screen(TranslationTextComponent("g
 
     override fun init() {
         addButton(Button(width / 2 - 50, height / 2 + 20, 100, 20, TranslationTextComponent("gui.spicyminer.done")) {
-            minecraft!!.displayGuiScreen(parent)
+            minecraft!!.forceSetScreen(parent)
         })
     }
 

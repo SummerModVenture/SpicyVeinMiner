@@ -25,11 +25,11 @@ object VeinMinerHelper {
     private val instances = ConcurrentLinkedQueue<VeinMinerInstance>()
 
     fun attemptExcavate(event: BlockEvent.BreakEvent) {
-        if (event.world.isRemote)
-            throw IllegalStateException("VeinMinerHelper#attemptExcavate() must be run on the server!")
-        val world = event.world.toServerWorld()
-        val player = event.player.toServerPlayerEntity()
-        val tool = event.player.heldItemMainhand ?: return
+        if (event.world.isClientSide)
+            error("VeinMinerHelper#attemptExcavate() must be run on the server!")
+        val world = event.world.asServerWorld()
+        val player = event.player.asServerPlayerEntity()
+        val tool = event.player.mainHandItem ?: return
 
         val preCheckEvent = VeinMinerEvent.PreToolUseCheck(event.pos, event.state, event.player, tool)
         MinecraftForge.EVENT_BUS.post(preCheckEvent)
@@ -59,18 +59,42 @@ object VeinMinerHelper {
     }
 
     fun isValidTool(stack: ItemStack) = ServerConfig.ignoreTools.get() ||
-            ServerConfig.allowedToolsSet.contains(stack.item.registryName)
+            ServerConfig.allowedTools.get().contains(stack.item.registryName.toString()) ||
+            stack.item is PickaxeItem ||
+            stack.item is AxeItem ||
+            stack.item is ShovelItem
 
-    fun isValidBlock(block: Block) = ServerConfig.allowedBlocksSet.contains(block.registryName)
+    fun isValidBlock(block: Block) = ServerConfig.allowedBlocks.get().contains(block.registryName.toString()) ||
+            block.registryName?.path?.let {
+                it.contains("ore") || it.contains("log")
+            } ?: false
+
+    private fun getAlikeBlocks(originPos: BlockPos, world: World, block: Block, playerLimit: Int, range: Int): Set<BlockPos> {
+        return mutableSetOf<BlockPos>().also { getAlikeBlocks(originPos, originPos, world, block, it, playerLimit, range) }
+    }
+
+    private fun getAlikeBlocks(
+        origin: BlockPos,
+        pos: BlockPos,
+        world: World,
+        block: Block,
+        blocks: MutableSet<BlockPos>,
+        playerLimit: Int,
+        range: Int
+    ) {
+        pos.getBlocksWithinMutable(1)
+            .filter { world.getBlock(it).block.registryName == block.registryName }
+            .filter { origin.distance(it) < range && blocks.size <= playerLimit && blocks.add(it.immutable()) }
+            .forEach { getAlikeBlocks(origin, it, world, block, blocks, playerLimit, range) }
+    }
 
     fun processLimitedBlocks(limit: Int) {
         var i = 0
         while (instances.peek() != null && i < limit) {
             val instance = instances.peek()
             if (!instance.isFinished)
-                while (instance.harvestNextBlock() && i < limit) {
+                while (instance.harvestNextBlock() && i < limit)
                     i++
-                }
             if (instance.isFinished) {
                 instance.cleanup()
                 instances.remove()
@@ -82,29 +106,9 @@ object VeinMinerHelper {
         while (instances.peek() != null) {
             val instance = instances.poll()
             if (!instance.isFinished)
-                while (instance.harvestNextBlock()) {
-                }
+                while (instance.harvestNextBlock()) {}
             instance.cleanup()
         }
-    }
-
-    private fun getAlikeBlocks(originPos: BlockPos, world: World, block: Block, playerLimit: Int, range: Int): Set<BlockPos> {
-        return mutableSetOf<BlockPos>().also { getAlikeBlocks(originPos, originPos, world, block, it, playerLimit, range) }
-    }
-
-    private fun getAlikeBlocks(
-            origin: BlockPos,
-            pos: BlockPos,
-            world: World,
-            block: Block,
-            blocks: MutableSet<BlockPos>,
-            playerLimit: Int,
-            range: Int
-    ) {
-        pos.getBlocksWithinMutable(1)
-                .filter { world.getBlock(it).block.registryName == block.registryName }
-                .filter { origin.distance(it) < range && blocks.size <= playerLimit && blocks.add(it.toImmutable()) }
-                .forEach { getAlikeBlocks(origin, it, world, block, blocks, playerLimit, range) }
     }
 
     class VeinMinerInstance(
@@ -131,26 +135,29 @@ object VeinMinerHelper {
             logger.debug("Attempting veinmine at $originPos with ${queue.size} blocks.")
         }
 
+        /**
+         * harvests the next block. returns true if there are more blocks to mine, false if this instance is complete
+         */
         fun harvestNextBlock(): Boolean {
             val nextPos = queue.poll()
 
-            Block.getDrops(state, world, nextPos, world.getTileEntity(nextPos), player, tool)
+            Block.getDrops(state, world, nextPos, world.getBlockEntity(nextPos), player, tool)
                     .forEach { stack -> drops.addDrop(stack) }
 
-            world.setBlockState(nextPos, Blocks.AIR.defaultState)
+            world.setBlockAndUpdate(nextPos, Blocks.AIR.defaultBlockState())
 
-            tool.damageItem(1, player, { it.sendBreakAnimation(player.swingingHand) })
-            player.addExhaustion(exhaustion.toFloat())
-            val fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, tool)
-            state.block.dropXpOnBlockBreak(world, originPos, state.block.getExpDrop(state, world, nextPos, fortune, 0))
+            tool.hurtAndBreak(1, player) { it.broadcastBreakEvent(player.swingingArm) }
+            player.causeFoodExhaustion(exhaustion.toFloat())
+            val fortune = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE, tool)
+            state.block.popExperience(world, originPos, state.block.getExpDrop(state, world, nextPos, fortune, 0))
             count++
             return !isFinished
         }
 
         fun cleanup() {
             if (!isFinished)
-                throw IllegalStateException("VeinMinerInstance#cleanup() was called early!")
-            drops.getDrops().forEach { Block.spawnAsEntity(world, originPos, it) }
+                error("VeinMinerInstance#cleanup() was called early!")
+            drops.getDrops().forEach { Block.popResource(world, originPos, it) }
             MinecraftForge.EVENT_BUS.post(VeinMinerEvent.PostToolUse(originPos, state, player, tool, player.minerData))
             player.addBlocksMined(count + 1)
         }

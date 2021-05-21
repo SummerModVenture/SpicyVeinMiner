@@ -2,19 +2,27 @@ package com.spicymemes.veinminer.config
 
 import com.spicymemes.veinminer.*
 import net.minecraftforge.common.*
+import net.minecraftforge.fml.*
 import net.minecraftforge.fml.config.*
 import net.minecraftforge.fml.loading.*
+import java.io.*
+import java.nio.file.*
 
 object Config {
 
-    val configDir = FMLPaths.getOrCreateGameRelativePath(FMLPaths.CONFIGDIR.get().resolve(MOD_ID), MOD_NAME)
+    val configPath: Path = FMLPaths.CONFIGDIR.get()
+    val modConfigPath: Path = Paths.get(configPath.toAbsolutePath().toString(), MOD_ID)
 
     fun register() {
-        registerConfig(ModConfig.Type.COMMON, ServerConfig.configSpec, "server")
-        registerConfig(ModConfig.Type.CLIENT, ClientConfig.configSpec, "client")
-    }
+        try {
+            Files.createDirectory(modConfigPath)
+        } catch (e: IOException) {
+            logger.error("Failed to create spicyminer config directory.", e)
+        }
 
-    private fun registerConfig(type: ModConfig.Type, spec: ForgeConfigSpec, fileName: String) {
-        SpicyVeinMiner.container.addConfig(SpicyModConfig(type, spec, SpicyVeinMiner.container, fileName))
+        ModLoadingContext.get().apply {
+            registerConfig(ModConfig.Type.COMMON, ServerConfig.configSpec, "$MOD_ID/server.toml")
+            registerConfig(ModConfig.Type.CLIENT, ClientConfig.configSpec, "$MOD_ID/client.toml")
+        }
     }
 }

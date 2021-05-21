@@ -10,12 +10,12 @@ object MinerStatus {
     private val players = ConcurrentHashMap<UUID, PlayerStatus>()
 
     fun removePlayer(player: PlayerEntity) {
-        players.remove(player.uniqueID)
+        players.remove(player.uuid)
     }
 
-    fun getForPlayer(player: PlayerEntity) = players[player.uniqueID]
+    fun getForPlayer(player: PlayerEntity) = players[player.uuid]
 
     fun setForPlayer(player: PlayerEntity, status: PlayerStatus) {
-        players[player.uniqueID] = status
+        players[player.uuid] = status
     }
 }

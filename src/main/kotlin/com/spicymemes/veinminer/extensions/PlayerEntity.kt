@@ -8,11 +8,9 @@ import net.minecraft.entity.player.*
 import net.minecraftforge.fml.network.*
 
 val ServerPlayerEntity.minerData: MinerData
-    get() = MinerDataStorage.get(world).getForPlayer(this)
+    get() = server.overworld().minerData.getForPlayer(this)
 
-fun ServerPlayerEntity.addBlocksMined(num: Int) = MinerDataStorage.get(world)
-        .also { it.addBlocksMined(this, num) }
-        .getForPlayer(this)
+fun ServerPlayerEntity.addBlocksMined(num: Int) = server.overworld().minerData.addBlocksMined(this, num)
 
 fun ServerPlayerEntity.setPreferredMode(mode: PreferredMode) {
     when (mode) {

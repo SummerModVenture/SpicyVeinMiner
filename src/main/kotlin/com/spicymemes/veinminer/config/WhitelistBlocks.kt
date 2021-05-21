@@ -6,15 +6,15 @@ import net.minecraft.block.*
 
 object WhitelistBlocks {
 
-    fun addDefaultBlocks() {
-        VANILLA_BLOCKS.forEach {
-            ifModLoaded(it.namespace) {
-                IMCHelper.addBlockWhitelist(it)
-            }
-        }
-    }
+//    fun addDefaultBlocks() {
+//        VANILLA_BLOCKS.forEach {
+//            ifModLoaded(it.namespace) {
+//                IMCHelper.addBlockWhitelist(it)
+//            }
+//        }
+//    }
 
-    val VANILLA_BLOCKS = listOf(
+    val VANILLA_BLOCKS = setOf(
             Blocks.COAL_ORE,
             Blocks.IRON_ORE,
             Blocks.GOLD_ORE,
@@ -36,6 +36,8 @@ object WhitelistBlocks {
             Blocks.STRIPPED_DARK_OAK_LOG,
             Blocks.STRIPPED_JUNGLE_LOG,
             Blocks.STRIPPED_OAK_LOG,
-            Blocks.STRIPPED_SPRUCE_LOG
-    ).mapNotNull { it.registryName }
+            Blocks.STRIPPED_SPRUCE_LOG,
+            Blocks.CRIMSON_STEM,
+            Blocks.WARPED_STEM
+    ).mapNotNull { it.registryName.toString() }
 }

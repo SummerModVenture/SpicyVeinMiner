@@ -10,6 +10,7 @@ import com.spicymemes.veinminer.extensions.*
 import com.spicymemes.veinminer.network.*
 import com.spicymemes.veinminer.network.packets.*
 import com.spicymemes.veinminer.util.*
+import net.minecraft.util.text.*
 import net.minecraftforge.event.*
 import net.minecraftforge.event.entity.player.*
 import net.minecraftforge.event.world.*
@@ -24,7 +25,7 @@ object EventHandler {
 
     @JvmStatic
     @SubscribeEvent
-    fun onServerStart(event: RegisterCommandsEvent) {
+    fun onRegisterCommands(event: RegisterCommandsEvent) {
         ModCommands.registerAll(event.dispatcher)
     }
 
@@ -32,10 +33,10 @@ object EventHandler {
     @SubscribeEvent
     fun onPlayerConnected(event: PlayerEvent.PlayerLoggedInEvent) {
         Network.mainChannel.send(
-                PacketDistributor.PLAYER.with { event.player.toServerPlayerEntity() },
+                PacketDistributor.PLAYER.with { event.player.asServerPlayerEntity() },
                 PingClientPacket(Instant.now().toEpochMilli())
         )
-        MinerDataStorage.get(event.player.world).initializePlayer(event.player)
+        event.player.commandSenderWorld.asServerWorld().minerData.initializePlayer(event.player)
     }
 
     @JvmStatic
@@ -48,7 +49,9 @@ object EventHandler {
     @SubscribeEvent
     fun onBlockBreak(event: BlockEvent.BreakEvent) {
         serverOnly(event.world) {
-            val tool = event.player.heldItemMainhand
+            if (event.player.isCreative)
+                return
+
             var activate = false
 
             val status = MinerStatus.getForPlayer(event.player)
@@ -78,8 +81,8 @@ object EventHandler {
     @JvmStatic
     @SubscribeEvent
     fun onPostToolUse(event: VeinMinerEvent.PostToolUse) {
-        serverOnly(event.player.world) {
-            val minerDataPost = event.player.toServerPlayerEntity().minerData
+        serverOnly(event.player.commandSenderWorld) {
+            val minerDataPost = event.player.asServerPlayerEntity().minerData
             if (minerDataPost.level > event.minerDataPre.level) {
                 //TODO: Find fix
 //            event.player.sendMessage(TextComponentTranslation("SpicyVeinMiner: LEVEL UP ${event.minerDataPre.level} >>>" +

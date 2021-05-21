@@ -12,11 +12,11 @@ import net.minecraft.util.text.*
 object ChangeModeCommand {
 
     fun register(dispatcher: CommandDispatcher<CommandSource>) {
-        val literalArgumentBuilder = Commands.literal("veinminer").requires { it.hasPermissionLevel(1) }
+        val literalArgumentBuilder = Commands.literal("veinminer")
 
         for (mode in PreferredMode.values()) {
             literalArgumentBuilder.then(Commands.literal(mode.codeName).executes {
-                setPreferredMode(it, it.source.asPlayer(), mode)
+                setPreferredMode(it, it.source.playerOrException, mode)
             })
         }
 
@@ -26,7 +26,7 @@ object ChangeModeCommand {
     private fun sendFeedback(player: ServerPlayerEntity, newMode: PreferredMode) {
         player.sendMessage(
                 TranslationTextComponent("commands.spicyminer.command.success.${newMode.codeName}"),
-                player.uniqueID
+                player.uuid
         )
     }
 

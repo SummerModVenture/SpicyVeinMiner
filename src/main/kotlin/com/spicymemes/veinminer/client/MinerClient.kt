@@ -12,10 +12,8 @@ object MinerClient {
 
     fun init() {
         MinecraftForge.EVENT_BUS.register(ActivateMinerKeybindManager)
-        ModList.get().getModContainerById(MOD_ID).ifPresent {
-            it.registerExtensionPoint(ExtensionPoint.CONFIGGUIFACTORY) {
-                BiFunction { mc: Minecraft, parent: Screen -> GuiConfig(parent) }
-            }
+        SpicyVeinMiner.container.registerExtensionPoint(ExtensionPoint.CONFIGGUIFACTORY) {
+            BiFunction { mc: Minecraft, parent: Screen -> GuiConfig(parent) }
         }
     }
 }

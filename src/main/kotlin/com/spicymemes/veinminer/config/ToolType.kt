@@ -12,4 +12,5 @@ package com.spicymemes.veinminer.config
  * @author Zach Kozar
  * @version 3/4/2019
  */
-inline class ToolType(val name: String)
+@JvmInline
+value class ToolType(val name: String)

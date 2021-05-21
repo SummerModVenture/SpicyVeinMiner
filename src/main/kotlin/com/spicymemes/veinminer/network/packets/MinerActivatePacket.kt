@@ -16,7 +16,7 @@ class MinerActivatePacket(val keyActive: Boolean) : SpicyPacket {
             val status = MinerStatus.getForPlayer(player)
 
             if (status == null) {
-                logger.warn("Could not find player ${player.name} (${player.uniqueID}) in MinerStatus map after " +
+                logger.warn("Could not find player ${player.name} (${player.uuid}) in MinerStatus map after " +
                         "receiving MinerActivatePacket!")
                 return
             }

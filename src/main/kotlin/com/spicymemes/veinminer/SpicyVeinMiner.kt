@@ -11,7 +11,10 @@ import net.minecraftforge.fml.*
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.config.*
 import net.minecraftforge.fml.event.lifecycle.*
+import net.minecraftforge.fml.network.*
+import org.apache.commons.lang3.tuple.Pair
 import org.apache.logging.log4j.LogManager
+import java.util.function.*
 
 @Mod(MOD_ID)
 @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -21,6 +24,12 @@ class SpicyVeinMiner {
         logger = LogManager.getLogger("SpicyMiner")
         container = ModLoadingContext.get().activeContainer
         Config.register()
+        container.registerExtensionPoint(ExtensionPoint.DISPLAYTEST) {
+            Pair.of<Supplier<String>, BiPredicate<String, Boolean>>(
+                Supplier { FMLNetworkConstants.IGNORESERVERONLY },
+                BiPredicate { _, _ -> true }
+            )
+        }
     }
 
     companion object {
@@ -43,15 +52,11 @@ class SpicyVeinMiner {
         @SubscribeEvent
         @JvmStatic
         fun setupServer(event: FMLDedicatedServerSetupEvent) {
-
         }
 
         @SubscribeEvent
         @JvmStatic
-        fun enqueueIMC(event: InterModEnqueueEvent) {
-            WhitelistTools.addDefaultTools()
-            WhitelistBlocks.addDefaultBlocks()
-        }
+        fun enqueueIMC(event: InterModEnqueueEvent) {}
 
         @SubscribeEvent
         @JvmStatic
@@ -70,5 +75,9 @@ class SpicyVeinMiner {
                         ServerConfig.addBlock(obj.name)
                     }
         }
+
+        @SubscribeEvent
+        @JvmStatic
+        fun setupComplete(event: FMLLoadCompleteEvent) {}
     }
 }

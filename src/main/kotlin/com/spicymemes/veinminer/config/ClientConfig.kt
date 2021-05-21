@@ -10,16 +10,9 @@ object ClientConfig {
     val preferredMode: ForgeConfigSpec.EnumValue<PreferredMode>
 
     init {
-        val configBuilder = ForgeConfigSpec.Builder()
-
-        configBuilder.push("client")
-
-        preferredMode = configBuilder
-                .comment("Set your preferred activation mode.")
-                .defineEnum("preferredMode", PreferredMode.PRESSED)
-
-        configBuilder.pop()
-
-        configSpec = configBuilder.build()
+        configSpec = config("client") {
+            preferredMode = comment("Set your preferred activation mode.")
+                    .defineEnum("preferredMode", PreferredMode.PRESSED)
+        }
     }
 }

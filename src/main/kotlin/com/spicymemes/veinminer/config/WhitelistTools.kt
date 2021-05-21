@@ -6,26 +6,25 @@ import net.minecraft.util.*
 
 object WhitelistTools {
 
-    fun addDefaultTools() {
-        addToolSet(ToolType("hammer"), HAMMER_ARRAY)
-        addToolSet(ToolType("drill"), DRILL_ARRAY)
-        addToolSet(ToolType("pickaxe"), PICKAXE_ARRAY)
-        addToolSet(ToolType("shovel"), SHOVEL_ARRAY)
-        addToolSet(ToolType("axe"), AXE_ARRAY)
-        addToolSet(ToolType("multitool"), MULTITOOL_ARRAY)
-    }
-
-    private fun addToolSet(toolType: ToolType, tools: List<ResourceLocation>) {
-        tools.forEach { tool ->
-            ifModLoaded(tool.namespace) {
-                IMCHelper.addTool(toolType.name, tool)
-            }
-        }
-    }
+//    fun addDefaultTools() {
+//        addToolSet(ToolType("hammer"), HAMMER_ARRAY)
+//        addToolSet(ToolType("drill"), DRILL_ARRAY)
+//        addToolSet(ToolType("pickaxe"), PICKAXE_ARRAY)
+//        addToolSet(ToolType("shovel"), SHOVEL_ARRAY)
+//        addToolSet(ToolType("axe"), AXE_ARRAY)
+//        addToolSet(ToolType("multitool"), MULTITOOL_ARRAY)
+//    }
+//
+//    private fun addToolSet(toolType: ToolType, tools: List<ResourceLocation>) {
+//        tools.forEach { tool ->
+//            ifModLoaded(tool.namespace) {
+//                IMCHelper.addTool(toolType.name, tool)
+//            }
+//        }
+//    }
 
     // list of non-vanilla tools. Any tools here will be automatically added if their mod is loaded.
-
-    val HAMMER_ARRAY = listOf(
+    val HAMMER_ARRAY = setOf(
             "redstonearsenal:tool.hammer_flux",
             "thermalfoundation:tool.hammer_aluminum",
             "thermalfoundation:tool.hammer_bronze",
@@ -55,17 +54,17 @@ object WhitelistTools {
             "techreborn:diamondjackhammer",
             "techreborn:ironjackhammer",
             "techreborn:steeljackhammer"
-    ).map { ResourceLocation(it) }
+    )
 
-    val DRILL_ARRAY = listOf(
+    val DRILL_ARRAY = setOf(
             "actuallyadditions:item_drill",
             "immersiveengineering:drill",
             "techreborn:advanceddrill",
             "techreborn:diamonddrill",
             "techreborn:irondrill"
-    ).map { ResourceLocation(it) }
+    )
 
-    val PICKAXE_ARRAY = listOf(
+    val PICKAXE_ARRAY = setOf(
 //            "appliedenergistics2:item.ToolCertusQuartzPickaxe",
 //            "appliedenergistics2:item.ToolNetherQuartzPickaxe",
 //            "BiomesOPlenty:pickaxeAmethyst",
@@ -149,9 +148,9 @@ object WhitelistTools {
             "techreborn:peridotpickaxe",
             "techreborn:rubypickaxe",
             "techreborn:sapphirepickaxe"
-    ).map { ResourceLocation(it) }
+    )
 
-    val SHOVEL_ARRAY = listOf(
+    val SHOVEL_ARRAY = setOf(
 //            "appliedenergistics2:item.ToolCertusQuartzSpade",
 //            "appliedenergistics2:item.ToolNetherQuartzSpade",
 //            "BiomesOPlenty:shovelAmethyst",
@@ -227,9 +226,9 @@ object WhitelistTools {
             "spicypineapple:pineapple_shovel",
             "spicypineapple:energized_shovel",
             "psi:psimetal_shovel"
-    ).map { ResourceLocation(it) }
+    )
 
-    val AXE_ARRAY = listOf(
+    val AXE_ARRAY = setOf(
 //            "appliedenergistics2:item.ToolCertusQuartzAxe",
 //            "appliedenergistics2:item.ToolNetherQuartzAxe",
 //            "BiomesOPlenty:axeAmethyst",
@@ -316,9 +315,9 @@ object WhitelistTools {
             "techreborn:peridotaxe",
             "techreborn:rubyaxe",
             "techreborn:sapphireaxe"
-    ).map { ResourceLocation(it) }
+    )
 
-    val MULTITOOL_ARRAY = listOf(
+    val MULTITOOL_ARRAY = setOf(
             "actuallyadditions:diamond_paxel",
             "actuallyadditions:emerald_paxel",
             "actuallyadditions:gold_paxel",
@@ -333,6 +332,6 @@ object WhitelistTools {
             "actuallyadditions:quartz_paxel",
             "actuallyadditions:stone_paxel",
             "actuallyadditions:wooden_paxel"
-    ).map { ResourceLocation(it) }
+    )
 
 }

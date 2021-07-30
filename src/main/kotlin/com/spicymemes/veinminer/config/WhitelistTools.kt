@@ -1,9 +1,5 @@
 package com.spicymemes.veinminer.config
 
-import com.spicymemes.core.util.*
-import com.spicymemes.veinminer.api.*
-import net.minecraft.util.*
-
 object WhitelistTools {
 
 //    fun addDefaultTools() {

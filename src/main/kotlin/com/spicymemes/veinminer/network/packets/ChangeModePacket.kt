@@ -3,10 +3,9 @@ package com.spicymemes.veinminer.network.packets
 import com.spicymemes.core.network.*
 import com.spicymemes.veinminer.*
 import com.spicymemes.veinminer.config.*
-import com.spicymemes.veinminer.server.*
 import com.spicymemes.veinminer.util.*
 import net.minecraft.network.*
-import net.minecraftforge.fml.network.NetworkEvent
+import net.minecraftforge.fmllegacy.network.*
 
 open class ChangeModePacket(val mode: PreferredMode) : SpicyPacket {
 
@@ -18,10 +17,10 @@ open class ChangeModePacket(val mode: PreferredMode) : SpicyPacket {
             ClientConfig.preferredMode.set(packet.mode)
         }
 
-        override fun encode(packet: ChangeModePacket, buf: PacketBuffer) {
+        override fun encode(packet: ChangeModePacket, buf: FriendlyByteBuf) {
             buf.writeShort(packet.mode.ordinal)
         }
 
-        override fun decode(buf: PacketBuffer) = ChangeModePacket(PreferredMode.values()[buf.readShort().toInt()])
+        override fun decode(buf: FriendlyByteBuf) = ChangeModePacket(PreferredMode.values()[buf.readShort().toInt()])
     }
 }

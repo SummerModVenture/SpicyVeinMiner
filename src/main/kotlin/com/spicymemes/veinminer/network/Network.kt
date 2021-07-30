@@ -3,7 +3,7 @@ package com.spicymemes.veinminer.network
 import com.spicymemes.core.network.*
 import com.spicymemes.veinminer.*
 import com.spicymemes.veinminer.network.packets.*
-import net.minecraftforge.fml.network.simple.*
+import net.minecraftforge.fmllegacy.network.simple.*
 
 object Network {
 

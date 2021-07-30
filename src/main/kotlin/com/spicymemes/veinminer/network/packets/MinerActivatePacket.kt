@@ -1,11 +1,11 @@
 package com.spicymemes.veinminer.network.packets
 
 import com.spicymemes.core.network.*
-import com.spicymemes.veinminer.logger
+import com.spicymemes.veinminer.*
 import com.spicymemes.veinminer.server.*
-import com.spicymemes.veinminer.util.PlayerStatus
+import com.spicymemes.veinminer.util.*
 import net.minecraft.network.*
-import net.minecraftforge.fml.network.*
+import net.minecraftforge.fmllegacy.network.*
 
 class MinerActivatePacket(val keyActive: Boolean) : SpicyPacket {
 
@@ -27,10 +27,10 @@ class MinerActivatePacket(val keyActive: Boolean) : SpicyPacket {
                 MinerStatus.setForPlayer(player, PlayerStatus.INACTIVE)
         }
 
-        override fun encode(packet: MinerActivatePacket, buf: PacketBuffer) {
+        override fun encode(packet: MinerActivatePacket, buf: FriendlyByteBuf) {
             buf.writeBoolean(packet.keyActive)
         }
 
-        override fun decode(buf: PacketBuffer) = MinerActivatePacket(buf.readBoolean())
+        override fun decode(buf: FriendlyByteBuf) = MinerActivatePacket(buf.readBoolean())
     }
 }

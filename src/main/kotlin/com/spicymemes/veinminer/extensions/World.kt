@@ -1,14 +1,15 @@
 package com.spicymemes.veinminer.extensions
 
 import com.spicymemes.veinminer.server.*
-import net.minecraft.world.*
-import net.minecraft.world.server.*
+import net.minecraft.server.level.*
+import net.minecraft.world.level.*
 
-@Deprecated("Use asServerWorld() extension", ReplaceWith("asServerWorld()"))
-fun IWorld.toServerWorld() = asServerWorld()
+fun LevelReader.asServerWorld(): ServerLevel = this as ServerLevel
 
-fun IWorld.asServerWorld(): ServerWorld = this as ServerWorld
-
-val ServerWorld.minerData: MinerDataStorage
-    get() =  server.overworld().dataStorage.computeIfAbsent({ MinerDataStorage() }, MinerDataStorage.ID)
+val ServerLevel.minerData: MinerDataStorage
+    get() =  server.overworld().dataStorage.computeIfAbsent(
+        { MinerDataStorage.from(it) },
+        { MinerDataStorage() },
+        MinerDataStorage.ID
+    )
 

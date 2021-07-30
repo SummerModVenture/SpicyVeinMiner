@@ -4,18 +4,20 @@ import com.spicymemes.veinminer.config.*
 import com.spicymemes.veinminer.network.*
 import com.spicymemes.veinminer.network.packets.*
 import com.spicymemes.veinminer.util.*
-import net.minecraft.client.settings.*
+import net.minecraft.client.*
 import net.minecraftforge.api.distmarker.*
 import net.minecraftforge.client.event.*
 import net.minecraftforge.eventbus.api.*
-import net.minecraftforge.fml.client.registry.*
+import net.minecraftforge.fmlclient.registry.*
+import org.lwjgl.glfw.*
 
 @OnlyIn(Dist.CLIENT)
 object ActivateMinerKeybindManager {
 
-    var joinedServer = false
+    private val inGame: Boolean
+        get() = Minecraft.getInstance().connection != null
     private var statusEnabled = false
-    private val activateKey = KeyBinding("spicyveinminer.key.enable", 96, "spicyveinminer.key.category")
+    private val activateKey = KeyMapping("spicyveinminer.key.enable", GLFW.GLFW_KEY_GRAVE_ACCENT, "spicyveinminer.key.category")
 
     init {
         ClientRegistry.registerKeyBinding(activateKey)
@@ -24,11 +26,11 @@ object ActivateMinerKeybindManager {
     @SubscribeEvent
     fun onKeyPressed(event: InputEvent) {
         val preferredMode = ClientConfig.preferredMode.get()
-        if (!joinedServer || (preferredMode != PreferredMode.PRESSED && preferredMode != PreferredMode.RELEASED))
+        if (!inGame || (preferredMode != PreferredMode.PRESSED && preferredMode != PreferredMode.RELEASED))
             return
 
         var sendPacket = false
-        val pressed = activateKey.isKeyDown
+        val pressed = activateKey.isDown
 
         if (preferredMode == PreferredMode.PRESSED) {
             if (pressed && !statusEnabled) {

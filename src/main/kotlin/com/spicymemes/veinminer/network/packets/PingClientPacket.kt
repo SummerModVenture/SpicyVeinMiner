@@ -1,12 +1,11 @@
 package com.spicymemes.veinminer.network.packets
 
 import com.spicymemes.core.network.*
-import com.spicymemes.veinminer.config.*
 import com.spicymemes.veinminer.*
-import com.spicymemes.veinminer.client.*
-import com.spicymemes.veinminer.network.Network
+import com.spicymemes.veinminer.config.*
+import com.spicymemes.veinminer.network.*
 import net.minecraft.network.*
-import net.minecraftforge.fml.network.*
+import net.minecraftforge.fmllegacy.network.*
 
 /**
  * Packet to ping the client to see if this mod is installed.
@@ -17,14 +16,13 @@ class PingClientPacket(val timestamp: Long) : SpicyPacket {
 
         override fun process(packet: PingClientPacket, ctx: NetworkEvent.Context) {
             logger.info("Received ping packet from server, sending client preferred mode back.")
-            ActivateMinerKeybindManager.joinedServer = true
             Network.mainChannel.sendToServer(ClientPresentPacket(packet.timestamp, ClientConfig.preferredMode.get()))
         }
 
-        override fun encode(packet: PingClientPacket, buf: PacketBuffer) {
+        override fun encode(packet: PingClientPacket, buf: FriendlyByteBuf) {
             buf.writeLong(packet.timestamp)
         }
 
-        override fun decode(buf: PacketBuffer) = PingClientPacket(buf.readLong())
+        override fun decode(buf: FriendlyByteBuf) = PingClientPacket(buf.readLong())
     }
 }

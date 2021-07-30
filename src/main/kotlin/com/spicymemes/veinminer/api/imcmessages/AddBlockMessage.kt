@@ -1,7 +1,7 @@
 package com.spicymemes.veinminer.api.imcmessages
 
 import com.spicymemes.veinminer.api.*
-import net.minecraft.util.*
+import net.minecraft.resources.*
 
 data class AddBlockMessage(val name: ResourceLocation) {
 

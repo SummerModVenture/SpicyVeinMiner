@@ -5,16 +5,12 @@ import com.spicymemes.veinminer.client.*
 import com.spicymemes.veinminer.config.*
 import com.spicymemes.veinminer.extensions.*
 import com.spicymemes.veinminer.network.*
-import net.minecraftforge.common.*
-import net.minecraftforge.eventbus.api.SubscribeEvent
+import net.minecraftforge.eventbus.api.*
 import net.minecraftforge.fml.*
-import net.minecraftforge.fml.common.Mod
-import net.minecraftforge.fml.config.*
+import net.minecraftforge.fml.common.*
 import net.minecraftforge.fml.event.lifecycle.*
-import net.minecraftforge.fml.network.*
-import org.apache.commons.lang3.tuple.Pair
-import org.apache.logging.log4j.LogManager
-import java.util.function.*
+import net.minecraftforge.fmllegacy.network.*
+import org.apache.logging.log4j.*
 
 @Mod(MOD_ID)
 @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -24,12 +20,13 @@ class SpicyVeinMiner {
         logger = LogManager.getLogger("SpicyMiner")
         container = ModLoadingContext.get().activeContainer
         Config.register()
-        container.registerExtensionPoint(ExtensionPoint.DISPLAYTEST) {
-            Pair.of<Supplier<String>, BiPredicate<String, Boolean>>(
-                Supplier { FMLNetworkConstants.IGNORESERVERONLY },
-                BiPredicate { _, _ -> true }
+        container.registerExtensionPoint(IExtensionPoint.DisplayTest::class.java) {
+            IExtensionPoint.DisplayTest(
+                { FMLNetworkConstants.IGNORESERVERONLY },
+                { _, _ -> true }
             )
         }
+
     }
 
     companion object {
@@ -71,7 +68,7 @@ class SpicyVeinMiner {
 
             event.getMessagesOf(AddBlockMessage)
                     .forEach { (msg, obj) ->
-                        logger.info("${msg.modId} adding block from IMC to veinminer whitelist: ${obj.name}")
+                        logger.info("${msg.modId()} adding block from IMC to veinminer whitelist: ${obj.name}")
                         ServerConfig.addBlock(obj.name)
                     }
         }

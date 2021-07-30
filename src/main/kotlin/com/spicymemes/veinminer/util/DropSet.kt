@@ -1,6 +1,6 @@
 package com.spicymemes.veinminer.util
 
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.*
 
 class DropSet {
 

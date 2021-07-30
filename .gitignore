@@ -31,4 +31,6 @@ grav.perl
 
 # Add other files here:
 run/
+runClient/
+runServer/
 logs/

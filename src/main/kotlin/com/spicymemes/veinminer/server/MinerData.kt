@@ -1,6 +1,5 @@
 package com.spicymemes.veinminer.server
 
-import com.spicymemes.veinminer.config.*
 import java.util.*
 import kotlin.math.*
 

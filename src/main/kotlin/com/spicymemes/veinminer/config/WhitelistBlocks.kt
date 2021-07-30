@@ -1,8 +1,6 @@
 package com.spicymemes.veinminer.config
 
-import com.spicymemes.core.util.*
-import com.spicymemes.veinminer.api.*
-import net.minecraft.block.*
+import net.minecraft.world.level.block.*
 
 object WhitelistBlocks {
 

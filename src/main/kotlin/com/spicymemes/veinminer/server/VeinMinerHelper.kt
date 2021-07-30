@@ -6,13 +6,13 @@ import com.spicymemes.veinminer.api.*
 import com.spicymemes.veinminer.config.*
 import com.spicymemes.veinminer.extensions.*
 import com.spicymemes.veinminer.util.*
-import net.minecraft.block.*
-import net.minecraft.enchantment.*
-import net.minecraft.entity.player.*
-import net.minecraft.item.*
-import net.minecraft.util.math.*
-import net.minecraft.world.*
-import net.minecraft.world.server.*
+import net.minecraft.core.*
+import net.minecraft.server.level.*
+import net.minecraft.world.item.*
+import net.minecraft.world.item.enchantment.*
+import net.minecraft.world.level.*
+import net.minecraft.world.level.block.*
+import net.minecraft.world.level.block.state.*
 import net.minecraftforge.common.*
 import net.minecraftforge.event.world.*
 import java.util.concurrent.*
@@ -28,7 +28,7 @@ object VeinMinerHelper {
         if (event.world.isClientSide)
             error("VeinMinerHelper#attemptExcavate() must be run on the server!")
         val world = event.world.asServerWorld()
-        val player = event.player.asServerPlayerEntity()
+        val player = event.player.asServerPlayer()
         val tool = event.player.mainHandItem ?: return
 
         val preCheckEvent = VeinMinerEvent.PreToolUseCheck(event.pos, event.state, event.player, tool)
@@ -69,14 +69,14 @@ object VeinMinerHelper {
                 it.contains("ore") || it.contains("log")
             } ?: false
 
-    private fun getAlikeBlocks(originPos: BlockPos, world: World, block: Block, playerLimit: Int, range: Int): Set<BlockPos> {
+    private fun getAlikeBlocks(originPos: BlockPos, world: Level, block: Block, playerLimit: Int, range: Int): Set<BlockPos> {
         return mutableSetOf<BlockPos>().also { getAlikeBlocks(originPos, originPos, world, block, it, playerLimit, range) }
     }
 
     private fun getAlikeBlocks(
         origin: BlockPos,
         pos: BlockPos,
-        world: World,
+        world: Level,
         block: Block,
         blocks: MutableSet<BlockPos>,
         playerLimit: Int,
@@ -112,12 +112,12 @@ object VeinMinerHelper {
     }
 
     class VeinMinerInstance(
-            private val originPos: BlockPos,
-            private val state: BlockState,
-            private val world: ServerWorld,
-            private val player: ServerPlayerEntity,
-            private val tool: ItemStack,
-            blocks: Set<BlockPos>
+        private val originPos: BlockPos,
+        private val state: BlockState,
+        private val world: ServerLevel,
+        private val player: ServerPlayer,
+        private val tool: ItemStack,
+        blocks: Set<BlockPos>
     ) {
 
         private val queue = ConcurrentLinkedQueue(blocks)

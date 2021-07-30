@@ -10,13 +10,12 @@ import com.spicymemes.veinminer.extensions.*
 import com.spicymemes.veinminer.network.*
 import com.spicymemes.veinminer.network.packets.*
 import com.spicymemes.veinminer.util.*
-import net.minecraft.util.text.*
 import net.minecraftforge.event.*
 import net.minecraftforge.event.entity.player.*
 import net.minecraftforge.event.world.*
 import net.minecraftforge.eventbus.api.*
 import net.minecraftforge.fml.common.*
-import net.minecraftforge.fml.network.*
+import net.minecraftforge.fmllegacy.network.*
 import java.time.*
 
 @Suppress("unused")
@@ -33,10 +32,10 @@ object EventHandler {
     @SubscribeEvent
     fun onPlayerConnected(event: PlayerEvent.PlayerLoggedInEvent) {
         Network.mainChannel.send(
-                PacketDistributor.PLAYER.with { event.player.asServerPlayerEntity() },
+                PacketDistributor.PLAYER.with { event.player.asServerPlayer() },
                 PingClientPacket(Instant.now().toEpochMilli())
         )
-        event.player.commandSenderWorld.asServerWorld().minerData.initializePlayer(event.player)
+        event.player.level.asServerWorld().minerData.initializePlayer(event.player)
     }
 
     @JvmStatic
@@ -82,7 +81,7 @@ object EventHandler {
     @SubscribeEvent
     fun onPostToolUse(event: VeinMinerEvent.PostToolUse) {
         serverOnly(event.player.commandSenderWorld) {
-            val minerDataPost = event.player.asServerPlayerEntity().minerData
+            val minerDataPost = event.player.asServerPlayer().minerData
             if (minerDataPost.level > event.minerDataPre.level) {
                 //TODO: Find fix
 //            event.player.sendMessage(TextComponentTranslation("SpicyVeinMiner: LEVEL UP ${event.minerDataPre.level} >>>" +

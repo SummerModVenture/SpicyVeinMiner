@@ -1,17 +1,17 @@
 package com.spicymemes.veinminer.api
 
 import com.spicymemes.veinminer.server.*
-import net.minecraft.block.*
-import net.minecraft.entity.player.*
-import net.minecraft.item.*
-import net.minecraft.util.math.*
+import net.minecraft.core.*
+import net.minecraft.world.entity.player.*
+import net.minecraft.world.item.*
+import net.minecraft.world.level.block.state.*
 import net.minecraftforge.eventbus.api.*
 
 abstract class VeinMinerEvent(
-        val pos: BlockPos,
-        val state: BlockState,
-        val player: PlayerEntity,
-        val tool: ItemStack
+    val pos: BlockPos,
+    val state: BlockState,
+    val player: Player,
+    val tool: ItemStack
 ) : Event() {
 
     /**
@@ -20,7 +20,7 @@ abstract class VeinMinerEvent(
     class PreToolUseCheck(
             pos: BlockPos,
             state: BlockState,
-            player: PlayerEntity,
+            player: Player,
             tool: ItemStack,
             var allowContinue: Boolean = true
     ) : VeinMinerEvent(pos, state, player, tool)
@@ -31,7 +31,7 @@ abstract class VeinMinerEvent(
     class PostToolUse(
             pos: BlockPos,
             state: BlockState,
-            player: PlayerEntity,
+            player: Player,
             tool: ItemStack,
             val minerDataPre: MinerData
     ) : VeinMinerEvent(pos, state, player, tool)

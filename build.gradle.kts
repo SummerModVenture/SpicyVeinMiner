@@ -9,6 +9,7 @@ plugins {
     signing
 }
 
+val modid: String by project
 val archivesBaseName: String by project
 val isRelease = !version.toString().endsWith("-SNAPSHOT")
 
@@ -25,8 +26,18 @@ minecraft {
             property("forge.logging.markers", "REGISTRIES")
             property("forge.logging.console.level", "DEBUG")
 
+            val minecraftUUID: String? by project
+            if (minecraftUUID != null)
+                args("--uuid", minecraftUUID)
+            val minecraftUsername: String? by project
+            if (minecraftUsername != null)
+                args("--username", minecraftUsername)
+            val minecraftAccessToken: String? by project
+            if (minecraftAccessToken != null)
+                args("--accessToken", minecraftAccessToken)
+
             mods {
-                create("spicycore") {
+                create(modid) {
                     source(sourceSets.main.get())
                 }
             }
@@ -39,7 +50,7 @@ minecraft {
             property("forge.logging.console.level", "DEBUG")
 
             mods {
-                create("spicycore") {
+                create(modid) {
                     source(sourceSets.main.get())
                 }
             }
@@ -51,10 +62,10 @@ minecraft {
             property("forge.logging.markers", "REGISTRIES")
             property("forge.logging.console.level", "DEBUG")
 
-            args("--mod", "examplemod", "--all", "--output", file("src/generated/resources/"), "--existing", file("src/main/resources/"))
+            args("--mod", modid, "--all", "--output", file("src/generated/resources/"), "--existing", file("src/main/resources/"))
 
             mods {
-                create("spicycore") {
+                create(modid) {
                     source(sourceSets.main.get())
                 }
             }
@@ -67,7 +78,10 @@ sourceSets.main {
 }
 
 repositories {
+    mavenCentral()
+    maven("https://maven.minecraftforge.net")
     maven("https://maven.masterzach32.net/artifactory/minecraft/")
+    maven("https://thedarkcolour.github.io/KotlinForForge/")
 }
 
 dependencies {
@@ -93,7 +107,7 @@ tasks {
         archiveBaseName.set(archivesBaseName)
         manifest {
             attributes(
-                "Specification-Title"     to "examplemod",
+                "Specification-Title"     to modid,
                 "Specification-Vendor"    to "examplemodsareus",
                 "Specification-Version"   to "1", // We are version 1 of ourselves
                 "Implementation-Title"    to project.name,

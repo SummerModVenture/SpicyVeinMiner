@@ -26,7 +26,6 @@ class SpicyVeinMiner {
                 { _, _ -> true }
             )
         }
-
     }
 
     companion object {

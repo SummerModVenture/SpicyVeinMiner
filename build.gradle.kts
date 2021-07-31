@@ -74,8 +74,12 @@ minecraft {
     }
 }
 
-sourceSets.main {
-    resources.srcDir("src/generated/resources")
+sourceSets {
+    main {
+        resources.srcDir("src/generated/resources")
+    }
+//
+//    create("api")
 }
 
 kotlin {
@@ -83,6 +87,10 @@ kotlin {
         main {
             kotlin.srcDir("src/main/generated")
         }
+
+//        create("api") {
+//            kotlin.srcDir("src/api/kotlin")
+//        }
     }
 }
 
@@ -91,14 +99,15 @@ repositories {
     maven("https://maven.minecraftforge.net")
     maven("https://maven.masterzach32.net/artifactory/minecraft/")
     maven("https://thedarkcolour.github.io/KotlinForForge/")
+    mavenLocal() // needed for local library-loading fix
 }
 
 dependencies {
     val mcVersion: String by project
     val forgeVersion: String by project
-    minecraft("net.minecraftforge:forge:$mcVersion-$forgeVersion")
+    minecraft("net.minecraftforge:forge:1.17.1-36.1.90-fix-1.17.x-library-loading")
 
-    implementation(fg.deobf("com.spicymemes:spicycore-1.17.1:2.1.1-SNAPSHOT"))
+    implementation("com.spicymemes:spicycore-1.17.1:2.1.1-SNAPSHOT")
 }
 
 tasks {
@@ -127,42 +136,59 @@ tasks {
     compileTestKotlin {
         kotlinOptions.jvmTarget = "16"
     }
+}
 
-    jar {
-        archiveBaseName.set(archivesBaseName)
-        manifest {
-            attributes(
-                "Specification-Title"     to modid,
-                "Specification-Vendor"    to "Forge",
-                "Specification-Version"   to "1", // We are version 1 of ourselves
-                "Implementation-Title"    to project.name,
-                "Implementation-Version"  to archiveVersion,
-                "Implementation-Vendor"   to "spicymemes",
-                "Implementation-Timestamp" to LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
-            )
-        }
-
-        finalizedBy("reobfJar")
-    }
+tasks.jar {
+    archiveBaseName.set(archivesBaseName)
+    manifest()
 }
 
 val sourcesJar by tasks.registering(Jar::class) {
     archiveBaseName.set(archivesBaseName)
     archiveClassifier.set("sources")
-    from(project.sourceSets["main"].allSource)
+    from(sourceSets.main.get().allSource)
 }
 
+val modJar by tasks.registering(Jar::class) {
+    archiveBaseName.set(archivesBaseName)
+    archiveClassifier.set("obf")
+    from(sourceSets.main.get().output)
+    manifest()
+    finalizedBy("reobfJar")
+}
+
+//val apiJar by tasks.registering(Jar::class) {
+//    archiveBaseName.set(archivesBaseName)
+//    from(sourceSets["api"].output)
+//    manifest()
+//}
+//
+//val apiSourcesJar by tasks.registering(Jar::class) {
+//    archiveBaseName.set(archivesBaseName)
+//    archiveClassifier.set("sources")
+//    from(sourceSets["api"].allSource)
+//    manifest()
+//}
+
 tasks.assemble {
-    dependsOn(sourcesJar)
+    dependsOn(modJar, sourcesJar)
+//    dependsOn(apiJar, apiSourcesJar)
 }
 
 publishing {
     publications {
         create<MavenPublication>("minecraft") {
-            artifact(tasks.jar)
-            artifact(sourcesJar)
             artifactId = archivesBaseName
+            artifact(tasks.jar)
+            artifact(modJar)
+            artifact(sourcesJar)
         }
+
+//        create<MavenPublication>("api") {
+//            artifactId = "$archivesBaseName-api"
+//            artifact(apiJar)
+//            artifact(apiSourcesJar)
+//        }
     }
 
     repositories {
@@ -201,4 +227,18 @@ release {
     preTagCommitMessage = "Release version"
     tagCommitMessage = "Release version"
     newVersionCommitMessage = "Next development version"
+}
+
+fun Jar.manifest() {
+    manifest {
+        attributes(
+            "Specification-Title"     to modid,
+            "Specification-Vendor"    to "Forge",
+            "Specification-Version"   to "1", // We are version 1 of ourselves
+            "Implementation-Title"    to project.name,
+            "Implementation-Version"  to archiveVersion,
+            "Implementation-Vendor"   to "spicymemes",
+            "Implementation-Timestamp" to LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
+        )
+    }
 }

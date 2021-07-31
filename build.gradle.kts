@@ -119,6 +119,10 @@ tasks {
 
         finalizedBy("reobfJar")
     }
+
+    build {
+        dependsOn(hideOfficialWarningUntilChanged)
+    }
 }
 
 val sourcesJar by tasks.registering(Jar::class) {

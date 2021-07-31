@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[34,)"
+loaderVersion="[37,)"
 license="All rights reserved"
 
 [[mods]]
@@ -16,6 +16,6 @@ description='''
 [[dependencies.spicyminer]]
     modId="spicycore"
     mandatory=true
-    versionRange="[1.16.5-2.0,)"
+    versionRange="[2.1,)"
     ordering="BEFORE"
     side="BOTH"

@@ -108,11 +108,11 @@ tasks {
         manifest {
             attributes(
                 "Specification-Title"     to modid,
-                "Specification-Vendor"    to "examplemodsareus",
+                "Specification-Vendor"    to "${modid}sareus",
                 "Specification-Version"   to "1", // We are version 1 of ourselves
                 "Implementation-Title"    to project.name,
                 "Implementation-Version"  to archiveVersion,
-                "Implementation-Vendor"   to "examplemodsareus",
+                "Implementation-Vendor"   to "${modid}sareus",
                 "Implementation-Timestamp" to LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
             )
         }

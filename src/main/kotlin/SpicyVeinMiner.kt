@@ -18,8 +18,10 @@ class SpicyVeinMiner {
 
     init {
         logger = LogManager.getLogger("SpicyMiner")
-        container = ModLoadingContext.get().activeContainer
-        Config.register()
+        ModLoadingContext.get().apply {
+            container = activeContainer
+            Config.register(this)
+        }
         container.registerExtensionPoint(IExtensionPoint.DisplayTest::class.java) {
             IExtensionPoint.DisplayTest(
                 { FMLNetworkConstants.IGNORESERVERONLY },
@@ -48,8 +50,7 @@ class SpicyVeinMiner {
 
         @SubscribeEvent
         @JvmStatic
-        fun setupServer(event: FMLDedicatedServerSetupEvent) {
-        }
+        fun setupServer(event: FMLDedicatedServerSetupEvent) {}
 
         @SubscribeEvent
         @JvmStatic

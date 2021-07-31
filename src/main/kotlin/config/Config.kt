@@ -16,7 +16,7 @@ object Config {
         try {
             Files.createDirectory(modConfigPath)
         } catch (e: IOException) {
-            logger.error("Failed to create spicyminer config directory.", e)
+            SpicyVeinMiner.logger.error("Failed to create spicyminer config directory.", e)
         }
 
         ModLoadingContext.get().apply {

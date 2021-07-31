@@ -10,6 +10,7 @@ plugins {
 }
 
 val modid: String by project
+val modName: String by project
 val archivesBaseName: String by project
 val isRelease = !version.toString().endsWith("-SNAPSHOT")
 
@@ -21,7 +22,7 @@ minecraft {
 
     runs {
         create("client") {
-            workingDirectory(project.file("run"))
+            workingDirectory(project.file("run/client"))
 
             property("forge.logging.markers", "REGISTRIES")
             property("forge.logging.console.level", "DEBUG")
@@ -44,7 +45,7 @@ minecraft {
         }
 
         create("server") {
-            workingDirectory(project.file("run"))
+            workingDirectory(project.file("run/server"))
 
             property("forge.logging.markers", "REGISTRIES")
             property("forge.logging.console.level", "DEBUG")
@@ -57,7 +58,7 @@ minecraft {
         }
 
         create("data") {
-            workingDirectory(project.file("run"))
+            workingDirectory(project.file("run/data"))
 
             property("forge.logging.markers", "REGISTRIES")
             property("forge.logging.console.level", "DEBUG")
@@ -77,6 +78,14 @@ sourceSets.main {
     resources.srcDir("src/generated/resources")
 }
 
+kotlin {
+    sourceSets {
+        main {
+            kotlin.srcDir("src/main/generated")
+        }
+    }
+}
+
 repositories {
     mavenCentral()
     maven("https://maven.minecraftforge.net")
@@ -93,12 +102,28 @@ dependencies {
 }
 
 tasks {
+    val generateModInfo by registering {
+        description = "Generates the ModInfo.kt source file."
+        doLast {
+            mkdir("src/main/generated")
+            file("src/main/generated/ModInfo.kt").writeText("""
+                package com.spicymemes.veinminer
+
+                const val MOD_ID = "$modid"
+                const val MOD_NAME = "$modName"
+                const val MOD_VERSION = "$version"
+            """.trimIndent())
+        }
+    }
+
     compileKotlin {
+        dependsOn(generateModInfo)
         kotlinOptions {
             jvmTarget = "16"
             freeCompilerArgs = listOf("-Xopt-in=kotlin.contracts.ExperimentalContracts")
         }
     }
+
     compileTestKotlin {
         kotlinOptions.jvmTarget = "16"
     }
@@ -108,20 +133,16 @@ tasks {
         manifest {
             attributes(
                 "Specification-Title"     to modid,
-                "Specification-Vendor"    to "${modid}sareus",
+                "Specification-Vendor"    to "Forge",
                 "Specification-Version"   to "1", // We are version 1 of ourselves
                 "Implementation-Title"    to project.name,
                 "Implementation-Version"  to archiveVersion,
-                "Implementation-Vendor"   to "${modid}sareus",
+                "Implementation-Vendor"   to "spicymemes",
                 "Implementation-Timestamp" to LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
             )
         }
 
         finalizedBy("reobfJar")
-    }
-
-    build {
-        dependsOn(hideOfficialWarningUntilChanged)
     }
 }
 

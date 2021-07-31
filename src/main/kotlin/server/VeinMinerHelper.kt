@@ -132,7 +132,7 @@ object VeinMinerHelper {
         private var count = 0
 
         init {
-            logger.debug("Attempting veinmine at $originPos with ${queue.size} blocks.")
+            SpicyVeinMiner.logger.debug("Attempting veinmine at $originPos with ${queue.size} blocks.")
         }
 
         /**

@@ -16,7 +16,7 @@ class ClientPresentPacket(val timestamp: Long, val mode: PreferredMode) : SpicyP
 
         override fun process(packet: ClientPresentPacket, ctx: NetworkEvent.Context) {
             val player = ctx.sender!!
-            logger.info("Player ${player.name.contents} has client mod installed. Set preferred mode: ${packet.mode}")
+            SpicyVeinMiner.logger.info("Player ${player.name.contents} has client mod installed. Set preferred mode: ${packet.mode}")
 
             when (packet.mode) {
                 PreferredMode.DISABLED,

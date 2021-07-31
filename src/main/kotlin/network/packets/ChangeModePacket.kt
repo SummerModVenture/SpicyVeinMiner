@@ -12,7 +12,7 @@ open class ChangeModePacket(val mode: PreferredMode) : SpicyPacket {
     companion object Handler : SpicyPacketHandler<ChangeModePacket> {
 
         override fun process(packet: ChangeModePacket, ctx: NetworkEvent.Context) {
-            logger.debug("Changing preferredMode to ${packet.mode}.")
+            SpicyVeinMiner.logger.debug("Changing preferredMode to ${packet.mode}.")
 
             ClientConfig.preferredMode.set(packet.mode)
         }

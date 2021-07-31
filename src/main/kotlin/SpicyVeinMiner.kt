@@ -32,6 +32,7 @@ class SpicyVeinMiner {
     companion object {
 
         lateinit var container: ModContainer
+        lateinit var logger: Logger
 
         @SubscribeEvent
         @JvmStatic

@@ -15,6 +15,6 @@ object Network {
         mainChannel.registerPacket(id++, ClientPresentPacket)
         mainChannel.registerPacket(id++, MinerActivatePacket)
         mainChannel.registerPacket(id++, ChangeModePacket)
-        logger.info("Registered $id packets on the main network.")
+        SpicyVeinMiner.logger.info("Registered $id packets on the main network.")
     }
 }

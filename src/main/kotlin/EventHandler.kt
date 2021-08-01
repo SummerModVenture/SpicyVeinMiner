@@ -1,15 +1,13 @@
-package com.spicymemes.veinminer.server
+package com.spicymemes.veinminer
 
-import com.spicymemes.core.extensions.*
-import com.spicymemes.core.util.*
-import com.spicymemes.veinminer.*
+import com.spicymemes.api.*
+import com.spicymemes.api.extensions.*
 import com.spicymemes.veinminer.api.*
 import com.spicymemes.veinminer.commands.*
 import com.spicymemes.veinminer.config.*
 import com.spicymemes.veinminer.extensions.*
 import com.spicymemes.veinminer.network.*
 import com.spicymemes.veinminer.network.packets.*
-import com.spicymemes.veinminer.util.*
 import net.minecraftforge.event.*
 import net.minecraftforge.event.entity.player.*
 import net.minecraftforge.event.world.*

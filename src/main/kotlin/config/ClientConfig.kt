@@ -1,6 +1,6 @@
 package com.spicymemes.veinminer.config
 
-import com.spicymemes.veinminer.util.*
+import com.spicymemes.veinminer.*
 import net.minecraftforge.common.*
 
 object ClientConfig {

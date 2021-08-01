@@ -1,21 +1,35 @@
 modLoader="javafml"
-loaderVersion="[36,)"
+loaderVersion="${loaderVersionRange}"
 license="All rights reserved"
 
 [[mods]]
-
 modId="spicyminer"
-version="${file.jarVersion}"
-displayName="Spicy VeinMiner"
+version="${version}"
+displayName="${modName}"
 credits="Dank memes"
 authors="Zach Kozar"
 description='''
 	Veinminer, but spicy
 '''
 
+# A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.spicyminer]]
-    modId="spicycore"
-    mandatory=true
-    versionRange="[2.1,)"
-    ordering="BEFORE"
-    side="BOTH"
+modId="forge"
+mandatory=true
+versionRange="${forgeVersionRange}"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.spicyminer]]
+modId="minecraft"
+mandatory=true
+versionRange="${mcVersionRange}"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.spicyminer]]
+modId="spicycore"
+mandatory=true
+versionRange="${spicyCoreVersionRange}"
+ordering="BEFORE"
+side="BOTH"

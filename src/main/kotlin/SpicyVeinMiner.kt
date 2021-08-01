@@ -1,6 +1,6 @@
 package com.spicymemes.veinminer
 
-import com.spicymemes.veinminer.api.imcmessages.*
+import com.spicymemes.veinminer.api.imc.messages.*
 import com.spicymemes.veinminer.client.*
 import com.spicymemes.veinminer.config.*
 import com.spicymemes.veinminer.extensions.*

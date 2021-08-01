@@ -1,6 +1,6 @@
 package com.spicymemes.veinminer.extensions
 
-import com.spicymemes.veinminer.server.*
+import com.spicymemes.veinminer.*
 import net.minecraft.server.level.*
 import net.minecraft.world.level.*
 

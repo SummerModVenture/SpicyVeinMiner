@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.*
 import java.time.*
 import java.time.format.*
 
@@ -9,12 +10,31 @@ plugins {
     signing
 }
 
-val modid: String by project
+val modId: String by project
 val modName: String by project
 val archivesBaseName: String by project
 val isRelease = !version.toString().endsWith("-SNAPSHOT")
 
+val apiSourceSet = sourceSets.create("api")
+sourceSets {
+    main {
+        compileClasspath += apiSourceSet.output
+        runtimeClasspath += apiSourceSet.output
+        resources.srcDir("src/generated/resources")
+    }
+}
+
+configurations {
+    get(apiSourceSet.implementationConfigurationName).extendsFrom(implementation.get())
+    get(apiSourceSet.runtimeOnlyConfigurationName).extendsFrom(runtimeOnly.get())
+}
+
+kotlin.sourceSets.main {
+    kotlin.srcDir("src/main/generated")
+}
+
 java.toolchain.languageVersion.set(JavaLanguageVersion.of(16))
+configureKotlinJvmOptions(jvmTarget = "16")
 
 minecraft {
     val mappingsVersion: String by project
@@ -38,8 +58,8 @@ minecraft {
                 args("--accessToken", minecraftAccessToken)
 
             mods {
-                create(modid) {
-                    source(sourceSets.main.get())
+                create(modId) {
+                    sources(sourceSets.main.get(), apiSourceSet)
                 }
             }
         }
@@ -51,8 +71,8 @@ minecraft {
             property("forge.logging.console.level", "DEBUG")
 
             mods {
-                create(modid) {
-                    source(sourceSets.main.get())
+                create(modId) {
+                    sources(sourceSets.main.get(), apiSourceSet)
                 }
             }
         }
@@ -63,43 +83,23 @@ minecraft {
             property("forge.logging.markers", "REGISTRIES")
             property("forge.logging.console.level", "DEBUG")
 
-            args("--mod", modid, "--all", "--output", file("src/generated/resources/"), "--existing", file("src/main/resources/"))
+            args("--mod", modId, "--all", "--output", file("src/generated/resources/"), "--existing", file("src/main/resources/"))
 
             mods {
-                create(modid) {
-                    source(sourceSets.main.get())
+                create(modId) {
+                    sources(sourceSets.main.get(), apiSourceSet)
                 }
             }
         }
     }
 }
 
-sourceSets {
-    main {
-        resources.srcDir("src/generated/resources")
-    }
-//
-//    create("api")
-}
-
-kotlin {
-    sourceSets {
-        main {
-            kotlin.srcDir("src/main/generated")
-        }
-
-//        create("api") {
-//            kotlin.srcDir("src/api/kotlin")
-//        }
-    }
-}
-
 repositories {
+    mavenLocal() // needed for local library-loading fix
     mavenCentral()
     maven("https://maven.minecraftforge.net")
     maven("https://maven.masterzach32.net/artifactory/minecraft/")
     maven("https://thedarkcolour.github.io/KotlinForForge/")
-    mavenLocal() // needed for local library-loading fix
 }
 
 dependencies {
@@ -107,72 +107,98 @@ dependencies {
     val forgeVersion: String by project
     minecraft("net.minecraftforge:forge:1.17.1-36.1.90-fix-1.17.x-library-loading")
 
-    implementation("com.spicymemes:spicycore-1.17.1:2.1.1-SNAPSHOT")
+    compileOnly(fg.deobf("com.spicymemes:spicycore-1.17.1:2.1.1-SNAPSHOT:api"))
+    runtimeOnly(fg.deobf("com.spicymemes:spicycore-1.17.1:2.1.1-SNAPSHOT"))
 }
 
-tasks {
-    val generateModInfo by registering {
-        description = "Generates the ModInfo.kt source file."
-        doLast {
-            mkdir("src/main/generated")
-            file("src/main/generated/ModInfo.kt").writeText("""
-                package com.spicymemes.veinminer
+val generateModInfo by tasks.registering {
+    description = "Generates the ModInfo.kt source file."
+    doLast {
+        mkdir("src/main/generated")
+        file("src/main/generated/ModInfo.kt").writeText("""
+            package com.spicymemes.veinminer
 
-                const val MOD_ID = "$modid"
-                const val MOD_NAME = "$modName"
-                const val MOD_VERSION = "$version"
-            """.trimIndent())
-        }
+            const val MOD_ID = "$modId"
+            const val MOD_NAME = "$modName"
+            const val MOD_VERSION = "$version"
+        """.trimIndent())
     }
+}
 
-    compileKotlin {
-        dependsOn(generateModInfo)
-        kotlinOptions {
-            jvmTarget = "16"
-            freeCompilerArgs = listOf("-Xopt-in=kotlin.contracts.ExperimentalContracts")
-        }
+tasks.compileKotlin {
+    dependsOn(generateModInfo)
+    kotlinOptions {
+        freeCompilerArgs = listOf("-Xopt-in=kotlin.contracts.ExperimentalContracts")
     }
+}
 
-    compileTestKotlin {
-        kotlinOptions.jvmTarget = "16"
+val updateModsToml by tasks.registering(Copy::class) {
+    outputs.upToDateWhen { false }
+
+    val mcVersionRange: String by project
+    val forgeVersionRange: String by project
+    val loaderVersionRange: String by project
+    val spicyCoreVersionRange: String by project
+    from(sourceSets.main.get().resources) {
+        include("META-INF/mods.toml")
+        expand(
+            "modName" to modName,
+            "version" to version,
+            "mcVersionRange" to mcVersionRange,
+            "forgeVersionRange" to forgeVersionRange,
+            "loaderVersionRange" to loaderVersionRange,
+            "spicyCoreVersionRange" to spicyCoreVersionRange
+        )
     }
+    into("$buildDir/resources/main")
+}
+
+tasks.classes {
+    dependsOn(updateModsToml)
 }
 
 tasks.jar {
     archiveBaseName.set(archivesBaseName)
+    from(sourceSets.main.get().output)
+    from(apiSourceSet.output)
     manifest()
+    finalizedBy("reobfJar")
+}
+
+val apiJar by tasks.registering(Jar::class) {
+    archiveBaseName.set(archivesBaseName)
+    archiveClassifier.set("api")
+    from(apiSourceSet.output)
+    manifest()
+    finalizedBy("reobfApiJar")
 }
 
 val sourcesJar by tasks.registering(Jar::class) {
     archiveBaseName.set(archivesBaseName)
     archiveClassifier.set("sources")
     from(sourceSets.main.get().allSource)
+    from(apiSourceSet.allSource)
 }
 
-val modJar by tasks.registering(Jar::class) {
+val deobfJar by tasks.registering(Jar::class) {
     archiveBaseName.set(archivesBaseName)
-    archiveClassifier.set("obf")
+    archiveClassifier.set("deobf")
     from(sourceSets.main.get().output)
+    from(apiSourceSet.output)
     manifest()
-    finalizedBy("reobfJar")
 }
-
-//val apiJar by tasks.registering(Jar::class) {
-//    archiveBaseName.set(archivesBaseName)
-//    from(sourceSets["api"].output)
-//    manifest()
-//}
-//
-//val apiSourcesJar by tasks.registering(Jar::class) {
-//    archiveBaseName.set(archivesBaseName)
-//    archiveClassifier.set("sources")
-//    from(sourceSets["api"].allSource)
-//    manifest()
-//}
 
 tasks.assemble {
-    dependsOn(modJar, sourcesJar)
-//    dependsOn(apiJar, apiSourcesJar)
+    dependsOn(apiJar, sourcesJar, deobfJar)
+}
+
+reobf {
+    create("apiJar") {
+        classpath.from(sourceSets["api"].compileClasspath)
+    }
+    create("jar") {
+        classpath.from(sourceSets.main.get().compileClasspath)
+    }
 }
 
 publishing {
@@ -180,15 +206,10 @@ publishing {
         create<MavenPublication>("minecraft") {
             artifactId = archivesBaseName
             artifact(tasks.jar)
-            artifact(modJar)
+            artifact(apiJar)
             artifact(sourcesJar)
+            artifact(deobfJar)
         }
-
-//        create<MavenPublication>("api") {
-//            artifactId = "$archivesBaseName-api"
-//            artifact(apiJar)
-//            artifact(apiSourcesJar)
-//        }
     }
 
     repositories {
@@ -232,13 +253,27 @@ release {
 fun Jar.manifest() {
     manifest {
         attributes(
-            "Specification-Title"     to modid,
-            "Specification-Vendor"    to "Forge",
+            "Specification-Title"     to modName,
+            "Specification-Vendor"    to "spicymemes",
             "Specification-Version"   to "1", // We are version 1 of ourselves
             "Implementation-Title"    to project.name,
-            "Implementation-Version"  to archiveVersion,
+            "Implementation-Version"  to project.version,
             "Implementation-Vendor"   to "spicymemes",
             "Implementation-Timestamp" to LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
         )
+    }
+}
+
+fun configureKotlinJvmOptions(jvmTarget: String) {
+    tasks.compileKotlin {
+        kotlinOptions.jvmTarget = jvmTarget
+    }
+
+    val compileApiKotlin by tasks.existing(KotlinJvmCompile::class) {
+        kotlinOptions.jvmTarget = jvmTarget
+    }
+
+    tasks.compileTestKotlin {
+        kotlinOptions.jvmTarget = jvmTarget
     }
 }

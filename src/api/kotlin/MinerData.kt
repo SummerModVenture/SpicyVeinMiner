@@ -1,11 +1,11 @@
-package com.spicymemes.veinminer.server
+package com.spicymemes.veinminer.api
 
 import java.util.*
 import kotlin.math.*
 
 data class MinerData(
-        val name: UUID,
-        val blocksMined: Int = 0
+    val name: UUID,
+    val blocksMined: Int = 0
 ) {
 
     val level = 1 + (0.15*sqrt(blocksMined.toDouble())).toInt()

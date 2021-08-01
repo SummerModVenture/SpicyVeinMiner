@@ -1,9 +1,9 @@
 package com.spicymemes.veinminer.client
 
+import com.spicymemes.veinminer.*
 import com.spicymemes.veinminer.config.*
 import com.spicymemes.veinminer.network.*
 import com.spicymemes.veinminer.network.packets.*
-import com.spicymemes.veinminer.util.*
 import net.minecraft.client.*
 import net.minecraftforge.api.distmarker.*
 import net.minecraftforge.client.event.*

@@ -1,6 +1,5 @@
-package com.spicymemes.veinminer.server
+package com.spicymemes.veinminer
 
-import com.spicymemes.veinminer.util.*
 import net.minecraft.world.entity.player.*
 import java.util.*
 import java.util.concurrent.*

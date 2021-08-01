@@ -1,8 +1,8 @@
 package com.spicymemes.veinminer.commands
 
 import com.mojang.brigadier.*
+import com.spicymemes.veinminer.*
 import com.spicymemes.veinminer.extensions.*
-import com.spicymemes.veinminer.util.*
 import net.minecraft.commands.*
 import net.minecraft.network.chat.*
 import net.minecraft.server.level.*

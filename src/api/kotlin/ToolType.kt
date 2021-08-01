@@ -1,4 +1,4 @@
-package com.spicymemes.veinminer.config
+package com.spicymemes.veinminer.api
 
 /*
  * SpicyVeinMiner - Created on 3/4/2019

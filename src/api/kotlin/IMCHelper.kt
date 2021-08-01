@@ -1,7 +1,6 @@
 package com.spicymemes.veinminer.api
 
-import com.spicymemes.veinminer.api.imcmessages.*
-import com.spicymemes.veinminer.config.*
+import com.spicymemes.veinminer.api.imc.messages.*
 import net.minecraft.resources.*
 import net.minecraftforge.fml.*
 

@@ -1,4 +1,4 @@
-package com.spicymemes.veinminer.api.imcmessages
+package com.spicymemes.veinminer.api.imc.messages
 
 import com.spicymemes.veinminer.api.*
 import net.minecraft.resources.*

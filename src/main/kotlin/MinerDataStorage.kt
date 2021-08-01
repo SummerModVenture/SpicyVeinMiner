@@ -1,6 +1,6 @@
-package com.spicymemes.veinminer.server
+package com.spicymemes.veinminer
 
-import com.spicymemes.veinminer.*
+import com.spicymemes.veinminer.api.*
 import net.minecraft.nbt.*
 import net.minecraft.world.entity.player.*
 import net.minecraft.world.level.saveddata.*

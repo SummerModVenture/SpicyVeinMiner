@@ -1,11 +1,9 @@
-package com.spicymemes.veinminer.server
+package com.spicymemes.veinminer
 
-import com.spicymemes.core.extensions.*
-import com.spicymemes.veinminer.*
+import com.spicymemes.api.extensions.*
 import com.spicymemes.veinminer.api.*
 import com.spicymemes.veinminer.config.*
 import com.spicymemes.veinminer.extensions.*
-import com.spicymemes.veinminer.util.*
 import net.minecraft.core.*
 import net.minecraft.server.level.*
 import net.minecraft.world.item.*
@@ -157,7 +155,7 @@ object VeinMinerHelper {
         fun cleanup() {
             if (!isFinished)
                 error("VeinMinerInstance#cleanup() was called early!")
-            drops.getDrops().forEach { Block.popResource(world, originPos, it) }
+            drops.forEach { Block.popResource(world, originPos, it) }
             MinecraftForge.EVENT_BUS.post(VeinMinerEvent.PostToolUse(originPos, state, player, tool, player.minerData))
             player.addBlocksMined(count + 1)
         }

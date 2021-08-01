@@ -1,4 +1,4 @@
-package com.spicymemes.veinminer.util
+package com.spicymemes.veinminer
 
 enum class PreferredMode(val codeName: String) {
     DISABLED("disabled"),

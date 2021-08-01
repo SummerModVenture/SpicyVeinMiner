@@ -6,6 +6,7 @@ import net.minecraftforge.fml.config.*
 import net.minecraftforge.fml.loading.*
 import java.io.*
 import java.nio.file.*
+import kotlin.io.FileAlreadyExistsException
 
 object Config {
 
@@ -15,6 +16,7 @@ object Config {
     fun register(ctx: ModLoadingContext) {
         try {
             Files.createDirectory(modConfigPath)
+        } catch (e: FileAlreadyExistsException) {
         } catch (e: IOException) {
             SpicyVeinMiner.logger.error("Failed to create spicyminer config directory.", e)
         }

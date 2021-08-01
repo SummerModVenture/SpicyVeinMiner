@@ -1,7 +1,6 @@
-package com.spicymemes.veinminer.api.imcmessages
+package com.spicymemes.veinminer.api.imc.messages
 
 import com.spicymemes.veinminer.api.*
-import com.spicymemes.veinminer.config.*
 import net.minecraft.resources.*
 
 @JvmRecord

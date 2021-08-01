@@ -1,6 +1,5 @@
 package com.spicymemes.veinminer.api
 
-import com.spicymemes.veinminer.server.*
 import net.minecraft.core.*
 import net.minecraft.world.entity.player.*
 import net.minecraft.world.item.*

@@ -1,9 +1,8 @@
 package com.spicymemes.veinminer.network.packets
 
-import com.spicymemes.core.network.*
+import com.spicymemes.api.network.*
 import com.spicymemes.veinminer.*
 import com.spicymemes.veinminer.config.*
-import com.spicymemes.veinminer.util.*
 import net.minecraft.network.*
 import net.minecraftforge.fmllegacy.network.*
 

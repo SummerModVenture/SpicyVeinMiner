@@ -1,5 +1,6 @@
 package com.spicymemes.veinminer
 
+import com.spicymemes.api.*
 import com.spicymemes.veinminer.api.*
 import net.minecraft.nbt.*
 import net.minecraft.world.entity.player.*
@@ -40,10 +41,11 @@ class MinerDataStorage(private val data: MutableMap<UUID, MinerData> = Concurren
     companion object {
         val ID = "${MOD_ID}_SpicyMinerPlayerData"
 
-        fun from(nbt: CompoundTag): MinerDataStorage {
+        fun from(tag: CompoundTag): MinerDataStorage {
             val data = ConcurrentHashMap<UUID, MinerData>()
-            for (i in 0 until nbt.getInt("count"))
-                nbt.apply {
+            val count: Int by tag
+            for (i in 0 until count)
+                tag.apply {
                     getUUID("name$i").also {
                         data[it] = MinerData(it, getInt("blocks$i"))
                     }

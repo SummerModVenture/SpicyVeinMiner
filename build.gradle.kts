@@ -24,9 +24,14 @@ sourceSets {
     }
 }
 
+val library: Configuration by configurations.creating
 configurations {
     get(apiSourceSet.implementationConfigurationName).extendsFrom(implementation.get())
     get(apiSourceSet.runtimeOnlyConfigurationName).extendsFrom(runtimeOnly.get())
+
+    implementation {
+        extendsFrom(library)
+    }
 }
 
 kotlin.sourceSets.main {
@@ -95,20 +100,29 @@ minecraft {
 }
 
 repositories {
-    mavenLocal() // needed for local library-loading fix
     mavenCentral()
     maven("https://maven.minecraftforge.net")
     maven("https://maven.masterzach32.net/artifactory/minecraft/")
     maven("https://thedarkcolour.github.io/KotlinForForge/")
+//    mavenLocal() // needed for local library-loading fix
+}
+
+// temporary fix for missing libs
+minecraft.runs.all {
+    lazyToken("minecraft_classpath") {
+        library.copyRecursive().resolve().joinToString(File.pathSeparator) { it.absolutePath }
+    }
 }
 
 dependencies {
     val mcVersion: String by project
     val forgeVersion: String by project
-    minecraft("net.minecraftforge:forge:1.17.1-36.1.90-fix-1.17.x-library-loading")
+    minecraft("net.minecraftforge:forge:$mcVersion-$forgeVersion")
 
     compileOnly(fg.deobf("com.spicymemes:spicycore-1.17.1:2.1.1-SNAPSHOT:api"))
     runtimeOnly(fg.deobf("com.spicymemes:spicycore-1.17.1:2.1.1-SNAPSHOT"))
+
+    library(kotlin("stdlib"))
 }
 
 val generateModInfo by tasks.registering {
@@ -151,6 +165,11 @@ val updateModsToml by tasks.registering(Copy::class) {
         )
     }
     into("$buildDir/resources/main")
+}
+
+tasks.processResources {
+    exclude("META-INF/mods.toml")
+    finalizedBy(updateModsToml)
 }
 
 tasks.classes {

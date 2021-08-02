@@ -119,8 +119,9 @@ dependencies {
     val forgeVersion: String by project
     minecraft("net.minecraftforge:forge:$mcVersion-$forgeVersion")
 
-    compileOnly(fg.deobf("com.spicymemes:spicycore-1.17.1:2.1.1-SNAPSHOT:api"))
-    runtimeOnly(fg.deobf("com.spicymemes:spicycore-1.17.1:2.1.1-SNAPSHOT"))
+    val spicyCoreVersion: String by project
+    compileOnly(fg.deobf("com.spicymemes:spicycore-1.17.1:$spicyCoreVersion:api"))
+    runtimeOnly(fg.deobf("com.spicymemes:spicycore-1.17.1:$spicyCoreVersion"))
 
     library(kotlin("stdlib"))
 }

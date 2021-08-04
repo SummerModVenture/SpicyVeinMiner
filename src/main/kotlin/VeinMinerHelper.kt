@@ -1,5 +1,6 @@
 package com.spicymemes.veinminer
 
+import com.spicymemes.api.*
 import com.spicymemes.api.extensions.*
 import com.spicymemes.veinminer.api.*
 import com.spicymemes.veinminer.config.*

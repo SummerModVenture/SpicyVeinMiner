@@ -1,5 +1,6 @@
 package com.spicymemes.veinminer.config
 
+import com.spicymemes.api.config.*
 import net.minecraft.resources.*
 import net.minecraftforge.common.*
 

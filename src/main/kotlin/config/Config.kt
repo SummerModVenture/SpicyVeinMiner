@@ -6,7 +6,6 @@ import net.minecraftforge.fml.config.*
 import net.minecraftforge.fml.loading.*
 import java.io.*
 import java.nio.file.*
-import kotlin.io.FileAlreadyExistsException
 
 object Config {
 

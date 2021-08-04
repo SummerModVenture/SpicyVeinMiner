@@ -18,9 +18,9 @@ class SpicyVeinMiner {
 
     init {
         logger = LogManager.getLogger("SpicyMiner")
-        ModLoadingContext.get().apply {
-            container = activeContainer
-            Config.register(this)
+        ModLoadingContext.get().also { context ->
+            container = context.activeContainer
+            Config.register(context)
         }
         container.registerExtensionPoint(IExtensionPoint.DisplayTest::class.java) {
             IExtensionPoint.DisplayTest(

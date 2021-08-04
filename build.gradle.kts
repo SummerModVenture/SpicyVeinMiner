@@ -1,3 +1,4 @@
+import net.minecraftforge.gradle.common.util.*
 import org.jetbrains.kotlin.gradle.dsl.*
 import java.time.*
 import java.time.format.*
@@ -26,9 +27,12 @@ sourceSets {
 
 val library: Configuration by configurations.creating
 configurations {
-    get(apiSourceSet.implementationConfigurationName).extendsFrom(implementation.get())
-    get(apiSourceSet.runtimeOnlyConfigurationName).extendsFrom(runtimeOnly.get())
-
+    named(apiSourceSet.implementationConfigurationName) {
+        extendsFrom(implementation.get())
+    }
+    named(apiSourceSet.runtimeOnlyConfigurationName) {
+        extendsFrom(runtimeOnly.get())
+    }
     implementation {
         extendsFrom(library)
     }
@@ -39,19 +43,35 @@ kotlin.sourceSets.main {
 }
 
 java.toolchain.languageVersion.set(JavaLanguageVersion.of(16))
-configureKotlinJvmOptions(jvmTarget = "16")
+configureKotlin {
+    kotlinOptions {
+        freeCompilerArgs = listOf("-Xopt-in=kotlin.contracts.ExperimentalContracts")
+        jvmTarget = "16"
+    }
+}
 
 minecraft {
     val mappingsVersion: String by project
     mappings("official", mappingsVersion)
 
     runs {
-        create("client") {
-            workingDirectory(project.file("run/client"))
-
+        val runConfig: RunConfig.() -> Unit = {
+            workingDirectory(project.file("run/$name"))
             property("forge.logging.markers", "REGISTRIES")
             property("forge.logging.console.level", "DEBUG")
 
+            mods {
+                register(modId) {
+                    sources(sourceSets.main.get(), apiSourceSet)
+                }
+            }
+        }
+
+        val client by registering(runConfig)
+        register("server", runConfig)
+        val data by registering(runConfig)
+
+        client {
             val minecraftUUID: String? by project
             if (minecraftUUID != null)
                 args("--uuid", minecraftUUID)
@@ -61,41 +81,18 @@ minecraft {
             val minecraftAccessToken: String? by project
             if (minecraftAccessToken != null)
                 args("--accessToken", minecraftAccessToken)
-
-            mods {
-                create(modId) {
-                    sources(sourceSets.main.get(), apiSourceSet)
-                }
-            }
         }
 
-        create("server") {
-            workingDirectory(project.file("run/server"))
-
-            property("forge.logging.markers", "REGISTRIES")
-            property("forge.logging.console.level", "DEBUG")
-
-            mods {
-                create(modId) {
-                    sources(sourceSets.main.get(), apiSourceSet)
-                }
-            }
-        }
-
-        create("data") {
-            workingDirectory(project.file("run/data"))
-
-            property("forge.logging.markers", "REGISTRIES")
-            property("forge.logging.console.level", "DEBUG")
-
+        data {
             args("--mod", modId, "--all", "--output", file("src/generated/resources/"), "--existing", file("src/main/resources/"))
-
-            mods {
-                create(modId) {
-                    sources(sourceSets.main.get(), apiSourceSet)
-                }
-            }
         }
+    }
+}
+
+// temporary fix for library-loading
+minecraft.runs.all {
+    lazyToken("minecraft_classpath") {
+        library.copyRecursive().resolve().joinToString(File.pathSeparator) { it.absolutePath }
     }
 }
 
@@ -103,15 +100,6 @@ repositories {
     mavenCentral()
     maven("https://maven.minecraftforge.net")
     maven("https://maven.masterzach32.net/artifactory/minecraft/")
-    maven("https://thedarkcolour.github.io/KotlinForForge/")
-//    mavenLocal() // needed for local library-loading fix
-}
-
-// temporary fix for missing libs
-minecraft.runs.all {
-    lazyToken("minecraft_classpath") {
-        library.copyRecursive().resolve().joinToString(File.pathSeparator) { it.absolutePath }
-    }
 }
 
 dependencies {
@@ -136,7 +124,7 @@ val generateModInfo by tasks.registering {
             const val MOD_ID = "$modId"
             const val MOD_NAME = "$modName"
             const val MOD_VERSION = "$version"
-        """.trimIndent())
+        """.trimIndent() + "\n")
     }
 }
 
@@ -147,37 +135,32 @@ tasks.compileKotlin {
     }
 }
 
-val updateModsToml by tasks.registering(Copy::class) {
-    outputs.upToDateWhen { false }
+tasks.commitNewVersion {
+    dependsOn(generateModInfo)
+}
 
+tasks.processResources {
+    duplicatesStrategy = DuplicatesStrategy.FAIL
     val mcVersionRange: String by project
     val forgeVersionRange: String by project
     val loaderVersionRange: String by project
     val spicyCoreVersionRange: String by project
-    from(sourceSets.main.get().resources) {
-        include("META-INF/mods.toml")
-        expand(
-            "modName" to modName,
-            "version" to version,
-            "mcVersionRange" to mcVersionRange,
-            "forgeVersionRange" to forgeVersionRange,
-            "loaderVersionRange" to loaderVersionRange,
-            "spicyCoreVersionRange" to spicyCoreVersionRange
-        )
+    val props = mapOf(
+        "modName" to modName,
+        "version" to project.version,
+        "mcVersionRange" to mcVersionRange,
+        "forgeVersionRange" to forgeVersionRange,
+        "loaderVersionRange" to loaderVersionRange,
+        "spicyCoreVersionRange" to spicyCoreVersionRange
+    )
+    inputs.properties(props)
+    filesMatching("META-INF/mods.toml") {
+        expand(props)
     }
-    into("$buildDir/resources/main")
-}
-
-tasks.processResources {
-    exclude("META-INF/mods.toml")
-    finalizedBy(updateModsToml)
-}
-
-tasks.classes {
-    dependsOn(updateModsToml)
 }
 
 tasks.jar {
+    duplicatesStrategy = DuplicatesStrategy.FAIL
     archiveBaseName.set(archivesBaseName)
     from(sourceSets.main.get().output)
     from(apiSourceSet.output)
@@ -186,6 +169,7 @@ tasks.jar {
 }
 
 val apiJar by tasks.registering(Jar::class) {
+    duplicatesStrategy = DuplicatesStrategy.FAIL
     archiveBaseName.set(archivesBaseName)
     archiveClassifier.set("api")
     from(apiSourceSet.output)
@@ -194,6 +178,7 @@ val apiJar by tasks.registering(Jar::class) {
 }
 
 val sourcesJar by tasks.registering(Jar::class) {
+    duplicatesStrategy = DuplicatesStrategy.FAIL
     archiveBaseName.set(archivesBaseName)
     archiveClassifier.set("sources")
     from(sourceSets.main.get().allSource)
@@ -201,6 +186,7 @@ val sourcesJar by tasks.registering(Jar::class) {
 }
 
 val deobfJar by tasks.registering(Jar::class) {
+    duplicatesStrategy = DuplicatesStrategy.FAIL
     archiveBaseName.set(archivesBaseName)
     archiveClassifier.set("deobf")
     from(sourceSets.main.get().output)
@@ -214,7 +200,7 @@ tasks.assemble {
 
 reobf {
     create("apiJar") {
-        classpath.from(sourceSets["api"].compileClasspath)
+        classpath.from(apiSourceSet.compileClasspath)
     }
     create("jar") {
         classpath.from(sourceSets.main.get().compileClasspath)
@@ -284,16 +270,8 @@ fun Jar.manifest() {
     }
 }
 
-fun configureKotlinJvmOptions(jvmTarget: String) {
-    tasks.compileKotlin {
-        kotlinOptions.jvmTarget = jvmTarget
-    }
-
-    val compileApiKotlin by tasks.existing(KotlinJvmCompile::class) {
-        kotlinOptions.jvmTarget = jvmTarget
-    }
-
-    tasks.compileTestKotlin {
-        kotlinOptions.jvmTarget = jvmTarget
-    }
+fun configureKotlin(config: KotlinJvmCompile.() -> Unit) {
+    tasks.named("compileApiKotlin", KotlinJvmCompile::class, config)
+    tasks.compileKotlin(config)
+    tasks.compileTestKotlin(config)
 }

@@ -28,7 +28,7 @@ class MinerDataStorage(private val data: MutableMap<UUID, MinerData> = Concurren
     }
 
     override fun save(nbt: CompoundTag): CompoundTag {
-        nbt.putInt("count", data.size)
+        nbt["count"] = data.size
         data.toList().forEachIndexed { i, (name, data) ->
             nbt.apply {
                 putUUID("name$i", name)

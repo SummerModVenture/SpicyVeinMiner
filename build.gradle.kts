@@ -13,7 +13,10 @@ plugins {
 
 val modId: String by project
 val modName: String by project
+val mcVersion: String by project
+val compositeVersion = "$mcVersion-$version"
 val archivesBaseName: String by project
+val apiArchivesBaseName = "$archivesBaseName-api"
 val isRelease = !version.toString().endsWith("-SNAPSHOT")
 
 val apiSourceSet = sourceSets.create("api")
@@ -59,7 +62,6 @@ minecraft {
             workingDirectory(project.file("run/$name"))
             property("forge.logging.markers", "REGISTRIES")
             property("forge.logging.console.level", "DEBUG")
-
             mods {
                 register(modId) {
                     sources(sourceSets.main.get(), apiSourceSet)
@@ -103,13 +105,12 @@ repositories {
 }
 
 dependencies {
-    val mcVersion: String by project
     val forgeVersion: String by project
     minecraft("net.minecraftforge:forge:$mcVersion-$forgeVersion")
 
     val spicyCoreVersion: String by project
-    compileOnly(fg.deobf("com.spicymemes:spicycore-1.17.1:$spicyCoreVersion:api"))
-    runtimeOnly(fg.deobf("com.spicymemes:spicycore-1.17.1:$spicyCoreVersion"))
+    compileOnly(fg.deobf("com.spicymemes:spicycore-api:$spicyCoreVersion"))
+    runtimeOnly(fg.deobf("com.spicymemes:spicycore:$spicyCoreVersion"))
 
     library(kotlin("stdlib"))
 }
@@ -159,43 +160,63 @@ tasks.processResources {
     }
 }
 
-tasks.jar {
+val jarConfig: Jar.() -> Unit = {
     duplicatesStrategy = DuplicatesStrategy.FAIL
     archiveBaseName.set(archivesBaseName)
+    archiveVersion.set(compositeVersion)
+}
+
+tasks.jar(jarConfig)
+tasks.jar {
     from(sourceSets.main.get().output)
     from(apiSourceSet.output)
     manifest()
     finalizedBy("reobfJar")
 }
 
-val apiJar by tasks.registering(Jar::class) {
-    duplicatesStrategy = DuplicatesStrategy.FAIL
-    archiveBaseName.set(archivesBaseName)
-    archiveClassifier.set("api")
-    from(apiSourceSet.output)
-    manifest()
-    finalizedBy("reobfApiJar")
-}
-
-val sourcesJar by tasks.registering(Jar::class) {
-    duplicatesStrategy = DuplicatesStrategy.FAIL
-    archiveBaseName.set(archivesBaseName)
+val sourcesJar by tasks.registering(Jar::class, jarConfig)
+sourcesJar {
     archiveClassifier.set("sources")
     from(sourceSets.main.get().allSource)
     from(apiSourceSet.allSource)
 }
 
-val deobfJar by tasks.registering(Jar::class) {
-    duplicatesStrategy = DuplicatesStrategy.FAIL
-    archiveBaseName.set(archivesBaseName)
+val deobfJar by tasks.registering(Jar::class, jarConfig)
+deobfJar {
     archiveClassifier.set("deobf")
     from(sourceSets.main.get().output)
     from(apiSourceSet.output)
     manifest()
 }
 
+val apiJarConfig: Jar.() -> Unit = {
+    duplicatesStrategy = DuplicatesStrategy.FAIL
+    archiveBaseName.set(apiArchivesBaseName)
+    archiveVersion.set(compositeVersion)
+}
+
+val apiJar by tasks.registering(Jar::class, apiJarConfig)
+apiJar {
+    from(apiSourceSet.output)
+    manifest()
+    finalizedBy("reobfApiJar")
+}
+
+val apiSourcesJar by tasks.registering(Jar::class, apiJarConfig)
+apiSourcesJar {
+    archiveClassifier.set("sources")
+    from(apiSourceSet.allSource)
+}
+
+val apiDeobfJar by tasks.registering(Jar::class, apiJarConfig)
+apiDeobfJar {
+    archiveClassifier.set("deobf")
+    from(apiSourceSet.output)
+    manifest()
+}
+
 tasks.assemble {
-    dependsOn(apiJar, sourcesJar, deobfJar)
+    dependsOn(sourcesJar, deobfJar, apiJar, apiSourcesJar, apiDeobfJar)
 }
 
 reobf {
@@ -209,12 +230,20 @@ reobf {
 
 publishing {
     publications {
-        create<MavenPublication>("minecraft") {
+        register<MavenPublication>("mod") {
             artifactId = archivesBaseName
+            version = compositeVersion
             artifact(tasks.jar)
-            artifact(apiJar)
             artifact(sourcesJar)
             artifact(deobfJar)
+        }
+
+        register<MavenPublication>("api") {
+            artifactId = apiArchivesBaseName
+            version = compositeVersion
+            artifact(apiJar)
+            artifact(apiSourcesJar)
+            artifact(apiDeobfJar)
         }
     }
 
@@ -243,7 +272,7 @@ signing {
     val signingKey: String? by project
     val signingPassword: String? by project
     useInMemoryPgpKeys(signingKey, signingPassword)
-    sign(publishing.publications["minecraft"])
+    sign(publishing.publications["mod"], publishing.publications["api"])
 }
 
 tasks.withType<Sign>().configureEach {
